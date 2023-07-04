@@ -1,4 +1,4 @@
-.PHONY: clean all test lint
+.PHONY: clean all test lint docker
 
 JAR=target/uberjar/tableworld-0.1.0-SNAPSHOT-standalone.jar
 
@@ -18,3 +18,6 @@ clean:
 lint:
 	lein kibit
 	lein bikeshed
+
+docker:
+	docker build -t tableworld .
