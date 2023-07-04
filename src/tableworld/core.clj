@@ -36,10 +36,14 @@
   [& {:keys [name port]
       :or   {name "default"
              port 9999}}]
-  (print (format "Server name: '%s'  port: %d.  Accepting connections...." name port))
+  (print
+   (format "Server name: '%s'  port: %d.  Accepting connections...."
+           name port))
   (flush)
   (start-server name port false))
 
 (comment
   (server/stop-server "foo")
-  (start-server "foo" 9999 true))
+  (start-server "foo" 9999 true)
+
+  (slurp (io/resource "world.tw")))
