@@ -35,8 +35,11 @@
        (remove (partial = [""]))
        (map map-block)))
 
-(comment
-  (let [secs (pull-sections (slurp (io/resource "world.tw")))]
+(defn parse-world [world-string]
+  (let [secs (pull-sections world-string)]
     (-> secs
         (update :rooms parse-rooms)
         (update :map parse-map))))
+
+(comment
+  (parse-world (slurp (io/resource "world.tw"))))
