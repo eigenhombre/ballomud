@@ -1,4 +1,4 @@
-.PHONY: clean all test
+.PHONY: clean all test lint
 
 JAR=target/uberjar/tableworld-0.1.0-SNAPSHOT-standalone.jar
 
@@ -14,3 +14,7 @@ test:
 
 clean:
 	rm -rf target
+
+lint:
+	lein kibit
+	lein bikeshed
