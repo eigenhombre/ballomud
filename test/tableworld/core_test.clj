@@ -6,5 +6,5 @@
 
 (deftest basic-parse
   (let [txt (slurp (io/resource "world.tw"))
-        result (pull-sections txt)]
+        result (parse/pull-sections txt)]
     (is (set/subset? #{:rooms :map} (set (keys result))))))
