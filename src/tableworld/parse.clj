@@ -10,15 +10,17 @@
                         s))))
 
 (defn- room-block [[id shortdesc-line & desclines]]
-  {:id id
-   :shortdesc (str/trim shortdesc-line)
-   :desc (str/join " " (map str/trim desclines))})
+  [id
+   {:id id
+    :shortdesc (str/trim shortdesc-line)
+    :desc (str/join " " (map str/trim desclines))}])
 
 (defn- parse-rooms [rooms]
   (->> (str/split rooms #"\n")
        (partition-by empty?)
        (remove (partial = [""]))
-       (map room-block)))
+       (map room-block)
+       (into {})))
 
 (defn- map-block [[line & lines]]
   (let [[room & neighbors] (str/split line #"\s+")

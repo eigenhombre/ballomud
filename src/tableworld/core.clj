@@ -6,11 +6,27 @@
             [clojure.string :as str]
             [tableworld.parse :as parse]))
 
-(defn handle-command [command]
+;; "accessors" for world:
+(defn location [world]
+  (get-in @world [:player :location]))
+
+(defn current-room [world]
+  (let [loc-id (location world)]
+    (get-in @world [:rooms loc-id])))
+
+(defn shortdesc [world]
+  (:shortdesc (current-room world)))
+
+(defn describe-location [world]
+  (:desc (current-room world)))
+
+(defn handle-command [command world]
   (cond
-    (= command "hello") "Hello, world!"
+    (= command "help") "Available: look help hello time"
+    (= command "hello") "Hello!"
+    (= command "look") (describe-location world)
     (= command "time") (str "Current time is: " (java.util.Date.))
-    :else (format "Unknown command: '%s'." command)))
+    :else (format "I don't understand '%s'." command)))
 
 (defn is-quit? [cmd]
   (= cmd "quit"))
@@ -20,7 +36,6 @@
        (= 1 (count s))))
 
 (defn accept [world]
-  (pprint @world)
   (loop []
     (print ">>> ")
     (flush)
@@ -28,10 +43,10 @@
       (cond
         (iseof command) nil  ;; done
         (seq command) (when-not (is-quit? command)
-                        (let [response (handle-command command)]
+                        (let [response (handle-command command world)]
                           (println response)
                           (recur)))
-        :t (recur)))))
+        :else (recur)))))
 
 (defn start-server [name port daemon? world]
   (server/start-server {:name name
@@ -40,24 +55,24 @@
                         :args [world]
                         :server-daemon daemon?}))
 
-(defn -main
-  [& {:keys [name port]
-      :or   {name "default"
-             port 9999}}]
+(defn- main [name port daemon?]
   (let [world (atom
-               (parse/parse-world (slurp (io/resource "world.tw"))))]
+               (assoc (parse/parse-world (slurp (io/resource "world.tw")))
+                      :player {:location "hearth"}))]
     (print
      (format "Server name: '%s'  port: %d.  Accepting connections...."
              name port))
     (flush)
-    (start-server name port false world)))
+    (start-server name port daemon? world)))
+
+(defn -main
+  [& {:keys [name port]
+      :or   {name "default"
+             port 9999}}]
+  (main name port false))
 
 (comment
-  (server/stop-server "foo")
   (pprint @(atom
             (parse/parse-world (slurp (io/resource "world.tw")))))
-  (start-server "foo" 9999 true
-                (atom
-                 (parse/parse-world (slurp (io/resource "world.tw")))))
-
-  (slurp (io/resource "world.tw")))
+  (server/stop-server "foo")
+  (main "foo" 9999 true))
