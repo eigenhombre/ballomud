@@ -6,5 +6,7 @@ RUN apt-get install -y make leiningen
 
 WORKDIR /home/janice
 
+COPY project.clj /home/janice
+RUN lein deps
 COPY . /home/janice
 RUN make test lint uberjar
