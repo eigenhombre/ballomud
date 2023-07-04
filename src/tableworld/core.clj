@@ -22,7 +22,7 @@
 
 (defn handle-command [command world]
   (cond
-    (= command "help") "Available: look help hello time"
+    (= command "help") "Available: look help hello time quit"
     (= command "hello") "Hello!"
     (= command "look") (describe-location world)
     (= command "time") (str "Current time is: " (java.util.Date.))
