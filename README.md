@@ -1,6 +1,7 @@
 # tableworld
 
-A little MUD- and MUDDL-inspired game.
+A little [MUD](https://en.wikipedia.org/wiki/Multi-user_dungeon)- and
+[MUDDL](https://if50.substack.com/p/1980-mud)-inspired game.
 
 # building it
 
