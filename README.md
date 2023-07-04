@@ -22,6 +22,24 @@ Install Java, Leiningen, make.  Then,
 
     telnet 127.0.0.1 9999
 
+## example
+
+    $ telnet 127.0.0.1 9999
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+    >>> help
+    Available: look help hello time
+    >>> reboot
+    I don't understand 'reboot'.
+    >>> look
+    You are in the hearth room.  There is a heavy stone table here near a
+    great fireplace lined with glazed red tile.  To the south lies the mud
+    room.
+    >>> quit
+    Connection closed by foreign host.
+    $
+
 # license
 
 MIT.
