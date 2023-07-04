@@ -1,0 +1,2 @@
+(ns tableworld.core-test)
+
