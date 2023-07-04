@@ -2,6 +2,8 @@
 
 <img src="tw.jpg" width="600">
 
+![build](https://github.com/eigenhombre/tableworld/actions/workflows/build.yml/badge.svg)
+
 A little [MUD](https://en.wikipedia.org/wiki/Multi-user_dungeon)- and
 [MUDDL](https://if50.substack.com/p/1980-mud)-inspired game.
 
