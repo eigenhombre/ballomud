@@ -67,7 +67,9 @@
                 (iseof command) (disconnect world player-name)
                 (seq command) (if (is-quit? command)
                                 (disconnect world player-name)
-                                (let [response (handle-command player-name command world)]
+                                (let [response (handle-command player-name
+                                                               command
+                                                               world)]
                                   (println response)
                                   (recur)))
                 :else (recur)))))))))
