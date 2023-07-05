@@ -27,17 +27,46 @@ Install Java, Leiningen, make.  Then,
     $ telnet 127.0.0.1 9999
     Trying 127.0.0.1...
     Connected to localhost.
-    Escape character is '^]'.
+    What is your name? John
+    Welcome to Table World, John.
     >>> help
-    Available: look help hello time
-    >>> reboot
-    I don't understand 'reboot'.
+    Available: look help hello time dump quit
+    >>> hello
+    Hello, John!
     >>> look
-    You are in the hearth room.  There is a heavy stone table here near a
-    great fireplace lined with glazed red tile.  To the south lies the mud
-    room.
-    >>> quit
-    Connection closed by foreign host.
+    You are in the hearth room.  There is a heavy stone table here
+    near a great fireplace lined with glazed red tile.  To the south
+    lies the mud room.
+    >>> dump
+    {:rooms
+     {"hearth"
+      {:id "hearth",
+       :shortdesc "The hearth.",
+       :desc
+       "You are in the hearth room.  There is a heavy stone table here
+       near a great fireplace lined with glazed red tile.  To the
+       south lies the mud room."},
+      "mudroom"
+      {:id "mudroom",
+       :shortdesc "Mudroom.",
+       :desc
+       "You are in the mud room.  Through the outside door to the
+       south you see a great wood.  The doorway on the north side
+       opens to the hearth."},
+      "forest"
+      {:id "forest",
+       :shortdesc "The great forest.",
+       :desc
+       "You are in the woods.  Trunks and heavy overgrowth obscure
+       your view in all directions.  Just to the north is a small hut,
+       with door ajar."}},
+     :map
+     ({:id "hearth", :neighbors {:s "mudroom"}}
+      {:id "mudroom", :neighbors {:n "hearth", :s "forest"}}
+      {:id "forest", :neighbors {:n "mudroom"}}),
+     :players {"John" {:location "hearth", :name "John"}}}
+    nil
+    >>> ^D
     $
 
 # license

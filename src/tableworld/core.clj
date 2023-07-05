@@ -27,9 +27,9 @@
 
 (defn handle-command [player-name command world]
   (cond
-    (= command "help") "Available: look help hello time quit"
+    (= command "help") "Available: look help hello time dump quit"
     (= command "hello") (format "Hello, %s!" player-name)
-    (= command "dump") (pprint @world)  ;; hidden
+    (= command "dump") (pprint @world)
     (= command "look") (describe-location player-name world)
     (= command "time") (str "Current time is: " (java.util.Date.))
     :else (format "Sorry, %s, I don't understand '%s'." player-name command)))
