@@ -24,3 +24,4 @@ docker:
 
 deploy: ${JAR}
 	rsync -vurt ../tableworld tw:
+	ssh tw 'killall java; sleep 1; cd tableworld; nohup ./tw 0.0.0.0 >/dev/null 2>&1 &'
