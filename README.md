@@ -16,7 +16,8 @@ game.
 
 # building it for yourself
 
-Install Java, Leiningen, make.  Then,
+Install [Leiningen](https://leiningen.org/), and `make` using your
+package manager.  Then,
 
     make
 
