@@ -41,15 +41,22 @@
     (swap! world (fn [world]
                    (when-let [player (get-in world [:players player-name])]
                      (-> world
-                         (assoc-in [:players player-name :location] new-room-id)
-                         (update-in [:players player-name :visited] conj new-room-id)))))
-    (println (location-description player-name world lengthy-description?))))
+                         (assoc-in [:players player-name :location]
+                                   new-room-id)
+                         (update-in [:players player-name :visited]
+                                    conj
+                                    new-room-id)))))
+    (println (location-description player-name
+                                   world
+                                   lengthy-description?))))
 
 (comment
-  (def world (atom {:rooms {"hearth" {:shortdesc "The hearth."
-                                      :desc "The Lorem Hearth, home of the many."}
-                            "ship" {:shortdesc "The ship."
-                                    :desc "A place of seasickness and spray."}}}))
+  (def world
+    (atom {:rooms
+           {"hearth" {:shortdesc "The hearth."
+                      :desc "The Lorem Hearth, home of the many."}
+            "ship" {:shortdesc "The ship."
+                    :desc "A place of seasickness and spray."}}}))
   (current-room "John" world)
   (location-description "John" world true)
   (add-player! "John" "hearth" world)
