@@ -6,7 +6,7 @@ all: uberjar
 
 uberjar: ${JAR}
 
-${JAR}: src/tableworld/*.clj
+${JAR}: src/tableworld/*.clj resources/*
 	lein uberjar
 
 test:

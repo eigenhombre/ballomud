@@ -16,7 +16,7 @@ game.
 
 # building it for yourself
 
-Install [Leiningen](https://leiningen.org/), and `make` using your
+Install [Leiningen](https://leiningen.org/) and `make` using your
 package manager.  Then,
 
     make
