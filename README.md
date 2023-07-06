@@ -8,17 +8,23 @@ A little [MUD](https://en.wikipedia.org/wiki/Multi-user_dungeon)- and
 [MUDDL](https://github.com/PDP-10/MUD1)-[inspired](https://if50.substack.com/p/1980-mud)
 game.
 
-# building it
+# try it out!
+
+    telnet 206.189.225.15 9999
+
+(May disappear or be restarted without warning....)
+
+# building it for yourself
 
 Install Java, Leiningen, make.  Then,
 
     make
 
-# running it
+# running a local copy
 
     ./tw
 
-# playing it
+# playing your local copy
 
     telnet 127.0.0.1 9999
 
