@@ -2,7 +2,8 @@
   :description "A small MUD-inspired game"
   :url "https://github.com/eigenhombre/tableworld"
   :license {:name "MIT"}
-  :dependencies [[org.clojure/clojure "1.11.1"]]
+  :dependencies [[org.clojure/clojure "1.11.1"]
+                 [clj-wrap-indent "1.0.0"]]
   :main ^:skip-aot tableworld.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all

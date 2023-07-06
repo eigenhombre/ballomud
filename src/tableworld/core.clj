@@ -1,6 +1,7 @@
 (ns tableworld.core
   (:gen-class)
-  (:require [clojure.core.server :as server]
+  (:require [clj-wrap-indent.core :as wrap]
+            [clojure.core.server :as server]
             [clojure.java.io :as io]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as str]
@@ -70,7 +71,7 @@
                                 (let [response (handle-command player-name
                                                                command
                                                                world)]
-                                  (println response)
+                                  (println (wrap/wrap-indent response 50 2))
                                   (recur)))
                 :else (recur)))))))))
 
@@ -90,11 +91,10 @@
     (flush)
     (start-server name port daemon? world)))
 
-(defn -main
-  [& {:keys [name port]
-      :or   {name "default"
-             port 9999}}]
-  (main name port false))
+(defn -main [& [name port]]
+  (let [name (or name "localhost")
+        port (Integer. (or port "9999"))]
+    (main name port false)))
 
 (when @live
   (pprint @(atom
