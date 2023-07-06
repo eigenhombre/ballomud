@@ -75,29 +75,30 @@
                                   (recur)))
                 :else (recur)))))))))
 
-(defn start-server [name port daemon? world]
-  (server/start-server {:name name
+(defn start-server [host port daemon? world]
+  (server/start-server {:name "tableworld"
+                        :address host
                         :port port
                         :accept 'tableworld.core/accept
                         :args [world]
                         :server-daemon daemon?}))
 
-(defn- main [name port daemon?]
+(defn- main [host port daemon?]
   (let [world (atom
                (parse/parse-world (slurp (io/resource "world.tw"))))]
     (print
      (format "Server name: '%s'  port: %d.  Accepting connections...."
-             name port))
+             host port))
     (flush)
-    (start-server name port daemon? world)))
+    (start-server host port daemon? world)))
 
-(defn -main [& [name port]]
-  (let [name (or name "localhost")
+(defn -main [& [host port]]
+  (let [host (or host "localhost")
         port (Integer. (or port "9999"))]
-    (main name port false)))
+    (main host port false)))
 
 (when @live
   (pprint @(atom
             (parse/parse-world (slurp (io/resource "world.tw")))))
-  (server/stop-server "foo")
-  (main "foo" 9999 true))
+  (server/stop-server "tableworld")
+  (main "localhost" 9999 true))

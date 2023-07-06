@@ -21,3 +21,6 @@ lint:
 
 docker:
 	docker build -t tableworld .
+
+deploy: ${JAR}
+	rsync -vurt ../tableworld tw:
