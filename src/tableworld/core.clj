@@ -33,7 +33,9 @@
     (= command "dump") (pprint @world)
     (= command "look") (describe-location player-name world)
     (= command "time") (str "Current time is: " (java.util.Date.))
-    :else (format "Sorry, %s, I don't understand '%s'." player-name command)))
+    :else (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
+                  player-name
+                  command)))
 
 (defn is-quit? [cmd]
   (= cmd "quit"))
@@ -50,12 +52,17 @@
   (loop []
     (print "What is your name? ")
     (flush)
-    (let [player-name (read-line)]
-      (if (get-in @world [:players player-name])
+    (let [player-name (str/trim (read-line))]
+      (cond
+        (get-in @world [:players player-name])
         (do
           (printf "Player name %s is taken!\n" player-name)
           (flush)
           (recur))
+
+        (empty? player-name) (recur)
+
+        :else
         (do
           (swap! world update :players assoc player-name {:location "hearth"
                                                           :name player-name})
