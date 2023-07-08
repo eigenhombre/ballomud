@@ -5,66 +5,12 @@
             [clojure.java.io :as io]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as str]
+            [tableworld.model :as m]
             [tableworld.parse :as parse]))
 
 ;; For REPL hot reloading:
 (defonce live (atom false))
 (comment (reset! live true))
-
-
-;; "accessors" for world:
-;; FIXME: refactor this so that @ operations are done separately from
-;; accessors, etc.
-(defn location [player-name world]
-  (get-in @world [:players player-name :location]))
-
-(defn current-room [player-name world]
-  (let [loc-id (location player-name world)]
-    (get-in @world [:rooms loc-id])))
-
-(defn shortdesc [player-name world]
-  (:shortdesc (current-room player-name world)))
-
-(defn location-description [player-name world long?]
-  ((if long? :desc :shortdesc) (current-room player-name world)))
-
-(defn add-player! [player-name room-id world]
-  (swap! world update :players assoc player-name {:location room-id
-                                                  :name player-name
-                                                  :visited #{room-id}})
-  (println (location-description player-name world true)))
-
-(defn set-player-location! [player-name new-room-id world]
-  (let [lengthy-description?
-        (not (get-in @world [:players player-name :visited new-room-id]))]
-    (println "Lengthy?" lengthy-description?)
-    (swap! world (fn [world]
-                   (when-let [player (get-in world [:players player-name])]
-                     (-> world
-                         (assoc-in [:players player-name :location]
-                                   new-room-id)
-                         (update-in [:players player-name :visited]
-                                    conj
-                                    new-room-id)))))
-    (println (location-description player-name
-                                   world
-                                   lengthy-description?))))
-
-(comment
-  (def world
-    (atom {:rooms
-           {"hearth" {:shortdesc "The hearth."
-                      :desc "The Lorem Hearth, home of the many."}
-            "ship" {:shortdesc "The ship."
-                    :desc "A place of seasickness and spray."}}}))
-  (current-room "John" world)
-  (location-description "John" world true)
-  (add-player! "John" "hearth" world)
-  (location "John" world)
-  (current-room "John" world)
-  (add-player! "Ben" "ship" world)
-  (set-player-location! "John" "ship" world)
-  (set-player-location! "John" "ship" world))
 
 (defn handle-command [player-name command world]
   (cond
@@ -72,8 +18,23 @@
 n s e w north south east west")
     (= command "hello") (format "Hello, %s!" player-name)
     (= command "dump") (pprint @world)
-    (= command "look") (location-description player-name world true)
+    (= command "look") (m/describe-player-location player-name @world true)
     (= command "time") (str "Current time is: " (java.util.Date.))
+    (#{"e" "east"
+       "n" "north"
+       "s" "south"
+       "w" "west"} command)
+    (let [{:keys [error status]}
+          (m/try-to-move-player!
+           player-name
+           (keyword (get {"east" "e"
+                          "north" "n"
+                          "south" "s"
+                          "west" "w"} command command))
+           world)]
+      (if (= status :fail)
+        (get m/ttmp-error-descriptions error "Unknown error")
+        (m/describe-player-location player-name @world false)))
     :else (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
                   player-name
                   command)))
@@ -85,12 +46,14 @@ n s e w north south east west")
   (and (= (first s) (char 4))
        (= 1 (count s))))
 
-
 (defn disconnect [world player-name]
-  (swap! world update :players dissoc player-name))
+  (m/del-player! player-name world))
 
 (defn splash []
   (println (slurp (io/resource "art.txt"))))
+
+(defn wrap [s]
+  (wrap/wrap-indent s 50 2))
 
 (defn accept [world]
   (splash)
@@ -99,7 +62,12 @@ n s e w north south east west")
     (flush)
     (let [player-name (str/trim (read-line))]
       (cond
-        (get-in @world [:players player-name])
+        (re-find #"\s" player-name)
+        (do
+          (println "Sorry, no whitespace in player names (for now).")
+          (recur))
+
+        (m/player-exists player-name world)
         (do
           (printf "Player name %s is taken!\n" player-name)
           (flush)
@@ -110,7 +78,8 @@ n s e w north south east west")
         :else
         (do
           (printf "Welcome to Table World, %s.\n" player-name)
-          (add-player! player-name "hearth" world)
+          (m/add-player! player-name "hearth" world)
+          (println (wrap (m/describe-player-location player-name @world true)))
           (loop []
             (print ">>> ")
             (flush)
@@ -122,7 +91,7 @@ n s e w north south east west")
                                 (let [response (handle-command player-name
                                                                command
                                                                world)]
-                                  (println (wrap/wrap-indent response 50 2))
+                                  (println (wrap response))
                                   (recur)))
                 :else (recur)))))))))
 
