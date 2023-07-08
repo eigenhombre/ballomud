@@ -25,17 +25,19 @@
 (defn- map-block [[line & lines]]
   (let [[room & neighbors] (str/split line #"\s+")
         others (map #(str/split (str/trim %) #"\s+") lines)]
-    {:id room
-     :neighbors (walk/keywordize-keys
-                 (into {}
-                       (map (comp vec reverse) (cons (rest neighbors)
-                                                     (map rest others)))))}))
+    [room
+     {:id room
+      :neighbors (walk/keywordize-keys
+                  (into {}
+                        (map (comp vec reverse) (cons (rest neighbors)
+                                                      (map rest others)))))}]))
 
 (defn- parse-map [map-string]
   (->> (str/split map-string #"\n")
        (partition-by empty?)
        (remove (partial = [""]))
-       (map map-block)))
+       (map map-block)
+       (into {})))
 
 (defn parse-world [world-string]
   (let [secs (pull-sections world-string)]
