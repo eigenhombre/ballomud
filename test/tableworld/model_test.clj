@@ -24,7 +24,8 @@
   (is (= {:error :no-player-loc
           :status :fail}
          (try-to-move-player! "Jabba" :to-hut example-world)))
-  (is (= {:status :ok, :error nil} (try-to-move-player! "John" :s example-world)))
+  (is (= {:status :ok, :error nil}
+         (try-to-move-player! "John" :s example-world)))
   (is (= "The hearth." (describe-player-location "John" @example-world false)))
   (is (= {:error :cannot-go-that-way
           :status :fail}
