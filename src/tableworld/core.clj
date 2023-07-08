@@ -82,7 +82,9 @@ n s e w north south east west")
           (do
             (printf "Welcome to Table World, %s.\n" player-name)
             (m/add-player! player-name "hearth" world)
-            (println (wrap (m/describe-player-location player-name @world true)))
+            (println (wrap (m/describe-player-location player-name
+                                                       @world
+                                                       true)))
             (loop []
               (print ">>> ")
               (flush)

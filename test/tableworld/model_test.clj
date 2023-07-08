@@ -13,12 +13,15 @@
                "ship" {:id "ship"
                        :neighbors {:s "hearth"}}}}))
 
+
 (deftest model
   (is (not (player-exists "John" example-world)))
   (is (nil? (player-room "John" @example-world)))
+
   (add-player! "John" "ship" example-world)
   (is (player-exists "John" example-world))
   (is (= "The ship." (describe-player-location "John" @example-world false)))
+  (is (= #{"John"} (room-occupants "ship" @example-world)))
   (is (= "A place of seasickness and spray."
          (describe-player-location "John" @example-world true)))
   (is (= {:error :no-player-loc
@@ -30,5 +33,9 @@
   (is (= {:error :cannot-go-that-way
           :status :fail}
          (try-to-move-player! "John" :s example-world)))
+
+  (add-player! "Mary" "hearth" example-world)
+  (is (= #{"John" "Mary"} (room-occupants "hearth" @example-world)))
+
   (del-player! "John" example-world)
   (is (not (player-exists "John" example-world))))

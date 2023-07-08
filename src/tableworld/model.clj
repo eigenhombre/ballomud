@@ -1,4 +1,5 @@
-(ns tableworld.model)
+(ns tableworld.model
+  (:require [clojure.string :as str]))
 
 (defn player-location-id [player-name world]
   (get-in world [:players player-name :location]))
@@ -13,9 +14,26 @@
     (assoc-in world-map [:players player-name] {:location room-id
                                                 :name player-name
                                                 :visited #{room-id}})))
+(defn room-occupants [room-id world-map]
+  (->> world-map
+       :players
+       (map second)
+       (filter (comp (partial = room-id) :location))
+       (map :name)
+       (into #{})))
+
+(defn describe-player-location-full [player-name world-map]
+  (let [room-id (player-location-id player-name world-map)
+        occupants (remove #{player-name} (room-occupants room-id world-map))
+        desc (:desc (player-room player-name world-map))]
+    (if (seq occupants)
+      (str desc "\n\nAlso here: " (str/join ", " occupants) ".")
+      desc)))
 
 (defn describe-player-location [player-name world-map full-desc?]
-  ((if full-desc? :desc :shortdesc) (player-room player-name world-map)))
+  (if full-desc?
+    (describe-player-location-full player-name world-map)
+    (:shortdesc (player-room player-name world-map))))
 
 (defn player-exists [player-name world-atom]
   (get-in @world-atom [:players player-name]))
