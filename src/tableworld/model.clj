@@ -30,16 +30,24 @@
       (str desc "\n\nAlso here: " (str/join ", " occupants) ".")
       desc)))
 
-(defn describe-player-location [player-name world-map full-desc?]
-  (if full-desc?
-    (describe-player-location-full player-name world-map)
-    (:shortdesc (player-room player-name world-map))))
+(defn describe-player-location
+  ([player-name world-map]
+   (describe-player-location player-name world-map nil))
+  ([player-name world-map mode]
+   (let [is-new? (get-in world-map [:players player-name :is-new-location?])]
+     (if (or is-new? (= mode :detailed))
+       (describe-player-location-full player-name world-map)
+       (:shortdesc (player-room player-name world-map))))))
 
 (defn player-exists [player-name world-atom]
   (get-in @world-atom [:players player-name]))
 
 (defn add-player! [player-name room-id world-atom]
-  (swap! world-atom (partial assoc-player-room player-name room-id)))
+  (swap! world-atom (fn [world]
+                      (-> world
+                          (->> (assoc-player-room player-name room-id))
+                          (assoc-in [:players player-name :is-new-location?]
+                                    true)))))
 
 (defn del-player! [player-name world-atom]
   (swap! world-atom update :players dissoc player-name))
@@ -54,7 +62,8 @@
        (fn [world]
          (let [old-loc (player-location-id player-name world)
                room (get-in world [:map old-loc])
-               new-loc (get-in world [:map old-loc :neighbors direction])]
+               new-loc (get-in world [:map old-loc :neighbors direction])
+               visited? (get-in world [:players player-name :visited new-loc])]
            (cond
              (not old-loc) (oops :no-player-loc)
              (not room) (oops :no-room-found)
@@ -62,7 +71,9 @@
              :else (-> world
                        (assoc-in [:players player-name :location] new-loc)
                        (update-in [:players player-name :visited]
-                                  conj new-loc))))))
+                                  conj new-loc)
+                       (assoc-in [:players player-name :is-new-location?]
+                                 (not visited?)))))))
       {:status :ok
        :error nil}
       (catch Exception e

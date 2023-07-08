@@ -20,22 +20,27 @@
 
   (add-player! "John" "ship" example-world)
   (is (player-exists "John" example-world))
-  (is (= "The ship." (describe-player-location "John" @example-world false)))
-  (is (= #{"John"} (room-occupants "ship" @example-world)))
   (is (= "A place of seasickness and spray."
-         (describe-player-location "John" @example-world true)))
+         (describe-player-location "John" @example-world)))
+  (is (= #{"John"} (room-occupants "ship" @example-world)))
   (is (= {:error :no-player-loc
           :status :fail}
          (try-to-move-player! "Jabba" :to-hut example-world)))
   (is (= {:status :ok, :error nil}
          (try-to-move-player! "John" :s example-world)))
-  (is (= "The hearth." (describe-player-location "John" @example-world false)))
+  (is (= "The Lorem Hearth, home of the many."
+         (describe-player-location "John" @example-world)))
   (is (= {:error :cannot-go-that-way
           :status :fail}
          (try-to-move-player! "John" :s example-world)))
+  (is (= {:status :ok, :error nil}
+         (try-to-move-player! "John" :n example-world)))
+  (is (= "The ship." (describe-player-location "John" @example-world)))
+  (is (= "A place of seasickness and spray."
+         (describe-player-location "John" @example-world :detailed)))
 
   (add-player! "Mary" "hearth" example-world)
-  (is (= #{"John" "Mary"} (room-occupants "hearth" @example-world)))
+  (is (= #{ "Mary"} (room-occupants "hearth" @example-world)))
 
   (del-player! "John" example-world)
   (is (not (player-exists "John" example-world))))

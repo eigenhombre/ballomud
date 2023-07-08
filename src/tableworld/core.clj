@@ -18,7 +18,9 @@
 n s e w north south east west")
     (= command "hello") (format "Hello, %s!" player-name)
     (= command "dump") (pprint @world)
-    (= command "look") (m/describe-player-location player-name @world true)
+    (= command "look") (m/describe-player-location player-name
+                                                   @world
+                                                   :detailed)
     (= command "time") (str "Current time is: " (java.util.Date.))
     (#{"e" "east"
        "n" "north"
@@ -34,7 +36,7 @@ n s e w north south east west")
            world)]
       (if (= status :fail)
         (get m/ttmp-error-descriptions error "Unknown error")
-        (m/describe-player-location player-name @world false)))
+        (m/describe-player-location player-name @world)))
     :else (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
                   player-name
                   command)))
@@ -84,7 +86,7 @@ n s e w north south east west")
             (m/add-player! player-name "hearth" world)
             (println (wrap (m/describe-player-location player-name
                                                        @world
-                                                       true)))
+                                                       :detailed)))
             (loop []
               (print ">>> ")
               (flush)
