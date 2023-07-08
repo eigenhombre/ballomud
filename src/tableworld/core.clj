@@ -58,42 +58,45 @@ n s e w north south east west")
 (defn accept [world]
   (splash)
   (loop []
-    (print "What is your name? ")
+    (print "Are you a bot?  Type 'n' or 'no' if not... ")
     (flush)
-    (let [player-name (str/trim (read-line))]
-      (cond
-        (re-find #"\s" player-name)
-        (do
-          (println "Sorry, no whitespace in player names (for now).")
-          (recur))
+    (when (#{"n" "no"} (-> (read-line) str/trim str/lower-case))
+      (print "What is your name? ")
+      (flush)
+      (let [player-name (str/trim (read-line))]
+        (cond
+          (re-find #"\s" player-name)
+          (do
+            (println "Sorry, no whitespace in player names (for now).")
+            (recur))
 
-        (m/player-exists player-name world)
-        (do
-          (printf "Player name %s is taken!\n" player-name)
-          (flush)
-          (recur))
-
-        (empty? player-name) (recur)
-
-        :else
-        (do
-          (printf "Welcome to Table World, %s.\n" player-name)
-          (m/add-player! player-name "hearth" world)
-          (println (wrap (m/describe-player-location player-name @world true)))
-          (loop []
-            (print ">>> ")
+          (m/player-exists player-name world)
+          (do
+            (printf "Player name %s is taken!\n" player-name)
             (flush)
-            (let [command (str/trim (str (read-line)))]
-              (cond
-                (iseof command) (disconnect world player-name)
-                (seq command) (if (is-quit? command)
-                                (disconnect world player-name)
-                                (let [response (handle-command player-name
-                                                               command
-                                                               world)]
-                                  (println (wrap response))
-                                  (recur)))
-                :else (recur)))))))))
+            (recur))
+
+          (empty? player-name) (recur)
+
+          :else
+          (do
+            (printf "Welcome to Table World, %s.\n" player-name)
+            (m/add-player! player-name "hearth" world)
+            (println (wrap (m/describe-player-location player-name @world true)))
+            (loop []
+              (print ">>> ")
+              (flush)
+              (let [command (str/trim (str (read-line)))]
+                (cond
+                  (iseof command) (disconnect world player-name)
+                  (seq command) (if (is-quit? command)
+                                  (disconnect world player-name)
+                                  (let [response (handle-command player-name
+                                                                 command
+                                                                 world)]
+                                    (println (wrap response))
+                                    (recur)))
+                  :else (recur))))))))))
 
 (defn start-server [host port daemon? world]
   (server/start-server {:name "tableworld"
