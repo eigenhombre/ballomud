@@ -133,7 +133,7 @@
         (print "What is your name? ")
         (flush))
       (let [player-name (if skip-intro?
-                          "Mr.Tester"
+                          (str "Tester" (rand-int 1000))
                           (str/trim (read-line)))]
         (cond
           (re-find #"\s" player-name)
