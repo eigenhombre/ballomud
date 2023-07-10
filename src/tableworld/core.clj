@@ -19,10 +19,11 @@
 
 (def stdouts (atom {}))
 
+(defn wrap [s]
+  (wrap/wrap-indent s 50 2))
+
 (defn async-println [content]
-  (println
-   (str "\n"
-        (wrap content)))
+  (println (str "\n" (wrap content)))
   (print ">>> ")
   (flush))
 
@@ -102,9 +103,6 @@
 
 (defn splash []
   (println (slurp (io/resource "art.txt"))))
-
-(defn wrap [s]
-  (wrap/wrap-indent s 50 2))
 
 (defn do-something-random-later []
   (future
