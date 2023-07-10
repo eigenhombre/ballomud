@@ -17,33 +17,51 @@
       (str/replace #"^(?:\'|\")" "")
       (str/replace #"(?:\'|\")$" "")))
 
+(def stdouts (atom {}))
+
+(defn async-println [content]
+  (println
+   (str "\n"
+        (wrap content)))
+  (print ">>> ")
+  (flush))
+
+(comment
+  (doseq [[pl out] @stdouts]
+    (binding [*out* out]
+      (async-println "Test of broadcasting from the REPL"))))
+
+(defn broadcast [player-name content]
+  (doseq [[pl out] @stdouts]
+    (binding [*out* out]
+      (async-println
+       (format "%s says: '%s'." player-name content)))))
+
 (defn say [player-name args]
   (let [content (->> args
                      (map remove-edge-quotes)
                      (str/join " "))]
-    ;; (enqueue {:player player-name
-    ;;           :action :say
-    ;;           :content content})
-    (format "You say: '%s'.\n" content)))
+    (broadcast player-name content)
+    ""))
 
 (defn handle-command [player-name command world]
   (let [[command & args] (str/split command #"\s")]
     (cond
       (= command "help") "Available:
-    dump
+    dump  -- show entire game state
     hello
     help
-    look
+    look  -- describe where you are
     quit
-    say
-    time
+    say   -- tell something to everyone
+    time  -- get current time
     n     or north
     s     or south
     e     or east
     w     or west
 "
       (= command "hello") (format "Hello, %s!" player-name)
-      (= command "dump") (pprint @world)
+      (= command "dump") (pprint [@stdouts @world])
       (= command "look") (m/describe-player-location player-name
                                                      @world
                                                      :detailed)
@@ -76,7 +94,11 @@
        (= 1 (count s))))
 
 (defn disconnect [world player-name]
-  (m/del-player! player-name world))
+  (m/del-player! player-name world)
+  (swap! stdouts (fn [m]
+                   (if (m player-name)
+                     (dissoc m player-name)
+                     m))))
 
 (defn splash []
   (println (slurp (io/resource "art.txt"))))
@@ -88,16 +110,14 @@
   (future
     (Thread/sleep (rand-int 10000))
     (when (zero? (rand-int 3))
-      (println
-       (str "\n"
-            (wrap (rand-nth ["You hear a soft breeze blowing."
-                             "Your stomach grumbles."
-                             "A fly buzzes unseen nearby."
-                             "Someone coughs."]))))
-      (print ">>> ")
-      (flush))))
+      (async-println
+       (rand-nth ["You hear a soft breeze blowing."
+                  "Your stomach grumbles."
+                  "A fly buzzes unseen nearby."
+                  "Someone coughs."])))))
 
-(defn do-player-loop [player-name world]
+(defn do-player-loop [out player-name world]
+  (swap! stdouts assoc player-name out)
   (printf "Welcome to Table World, %s.\n" player-name)
   (m/add-player! player-name "hearth" world)
   (println (wrap (m/describe-player-location player-name
@@ -150,7 +170,7 @@
           (empty? player-name) (recur)
 
           :else
-          (do-player-loop player-name world))))))
+          (do-player-loop *out* player-name world))))))
 
 (defn start-server [host port daemon? skip-intro? world]
   (server/start-server {:name "tableworld"
@@ -175,7 +195,7 @@
     (main host port false false)))
 
 (when @live
-  (pprint @(atom
-            (parse/parse-world (slurp (io/resource "world.tw")))))
+  #_(pprint @(atom
+              (parse/parse-world (slurp (io/resource "world.tw")))))
   (server/stop-server "tableworld")
   (main "localhost" 9999 true true))
