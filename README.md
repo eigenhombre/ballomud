@@ -68,35 +68,37 @@ package manager.  Then,
 
       Welcome to the world.
 
-    What is your name? adsf adsf
-    Sorry, no whitespace in player names (for now).
-    What is your name? John
-    Welcome to Table World, John.
+    Are you a bot?  Type 'n' or 'no' if not... n
+    What is your name? Otter
+    Welcome to Table World, Otter.
       You are in the hearth room.  There is a heavy
       stone table here near a great fireplace lined
       with glazed red tile.  To the south lies the mud
       room.
+
+      Also here: John.
+    >>> say Hello, everyone.
+
+      Otter says: 'Hello, everyone.'.
+    >>>
     >>> s
-      Mudroom.
-    >>> look
       You are in the mud room.  Through the outside
       door to the south you see a great wood.  The
       doorway on the north side opens to the hearth.
-    >>> s
-      The great forest.
-    >>> look
+    >>> south
       You are in the woods.  Trunks and heavy
       overgrowth obscure your view in all directions.
       Just to the north is a small hut, with door
       ajar.
-    >>> help
-      Available: look help hello time dump quit
-      n s e w north south east west
-    >>> e
-      You cannot go that way.
-    >>> hello
-      Hello, John!
-    >>> quit
+    >>> south
+      You're in the deep forest.  Brush and vines grow
+      and dangle all about you.  The forest is
+      somewhat less dense to the north.
+    >>> north
+      The great forest.
+    >>>
+      You hear a soft breeze blowing.
+    >>> ^D
     Connection closed by foreign host.
     $
 
