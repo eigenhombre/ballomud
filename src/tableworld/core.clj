@@ -12,15 +12,19 @@
 (defonce live (atom false))
 (comment (reset! live true))
 
-(defn remove-edge-quotes [s]
+(defn- remove-edge-quotes [s]
   (-> s
       (str/replace #"^(?:\'|\")" "")
       (str/replace #"(?:\'|\")$" "")))
 
-(defn say [player-name args world]
-  (format "You say: '%s'.\n" (->> args
-                                  (map remove-edge-quotes)
-                                  (str/join " "))))
+(defn say [player-name args]
+  (let [content (->> args
+                     (map remove-edge-quotes)
+                     (str/join " "))]
+    ;; (enqueue {:player player-name
+    ;;           :action :say
+    ;;           :content content})
+    (format "You say: '%s'.\n" content)))
 
 (defn handle-command [player-name command world]
   (let [[command & args] (str/split command #"\s")]
@@ -44,7 +48,7 @@
                                                      @world
                                                      :detailed)
       (= command "time") (str "Current time is: " (java.util.Date.))
-      (= command "say") (say player-name args world)
+      (= command "say") (say player-name args)
       (#{"e" "east"
          "n" "north"
          "s" "south"
