@@ -120,11 +120,11 @@
   (when-not skip-intro?
     (print "Are you a bot?  Type 'n' or 'no' if not... ")
     (flush))
-  (loop []
-    (when (or skip-intro?
-              (#{"n" "no"} (-> (read-line)
-                               str/trim
-                               str/lower-case)))
+  (when (or skip-intro?
+            (#{"n" "no"} (-> (read-line)
+                             str/trim
+                             str/lower-case)))
+    (loop []
       (when-not skip-intro?
         (print "What is your name? ")
         (flush))
