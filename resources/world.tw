@@ -18,11 +18,25 @@ forest
         your view in all directions.  Just to the north is a small
         hut, with door ajar.
 
+deepforest
+        The deep forest.
+        You're in the deep forest.  Brush and vines grow and dangle
+        all about you.  The forest is somewhat less dense to the
+        north.
+
 # Map
 
-hearth  n       mudroom s
+hearth     n mudroom    s
 
-mudroom n       hearth  n
-        n       forest  s
+mudroom    n hearth     n
+           n forest     s
 
-forest  n       mudroom n
+forest     n mudroom    n
+           n deepforest s
+           n deepforest e
+           n deepforest w
+
+deepforest n deepforest s
+           n forest     n
+           n deepforest e
+           n deepforest w
