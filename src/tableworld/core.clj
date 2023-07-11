@@ -84,48 +84,56 @@
 (defn handle-command [player-name command world]
   (let [command-words (->> (str/split command #"\s")
                            (remove #{"the"})
-                           (map str/lower-case))]
-    (match [command-words]
-      [(["help"] :seq)] help
-      [(["help" "me"] :seq)] help
-      [(["i" "need" "help"] :seq)] help
-      [(["hi"] :seq)] (format "Hello, %s!" player-name)
-      [(["hello"] :seq)] (format "Hello, %s!" player-name)
-      [(["hi" "there"] :seq)] (format "Hello, %s!" player-name)
-      [(["hello" "there"] :seq)] (format "Hello, %s!" player-name)
-      [(["hi"] :seq)] (format "Hello, %s!" player-name)
-      [(["hello"] :seq)] (format "Hello, %s!" player-name)
-      [(["look"] :seq)] (m/describe-player-location player-name
-                                                    @world
-                                                    :detailed)
-      [(["look" "around"] :seq)] (m/describe-player-location player-name
-                                                             @world
-                                                             :detailed)
-      [(["dump" "world"] :seq)] (dump-state world)
-      [(["show" "game" "state"] :seq)] (dump-state world)
-      [(["dump" "world"] :seq)] (dump-state world)
-      [(["dump"] :seq)] (dump-state world)
-      [(["time"] :seq)] (get-time)
-      [(["current" "time"] :seq)] (get-time)
-      [(["show" "current" "time"] :seq)] (get-time)
-      [(["what" "is" "current" "time"] :seq)] (get-time)
-      [(["say" & something] :seq)] (say player-name something)
-      [(["tell" "everyone" & something] :seq)] (say player-name something)
-      [(["time"] :seq)] (get-time)
-      [(["go" direction] :seq)] (try-to-move player-name direction world)
-      [(["go" "to" direction] :seq)] (try-to-move player-name direction world)
-      ;; FIXME: :or clause?
-      [(["n"] :seq)] (try-to-move player-name "n" world)
-      [(["s"] :seq)] (try-to-move player-name "s" world)
-      [(["e"] :seq)] (try-to-move player-name "e" world)
-      [(["w"] :seq)] (try-to-move player-name "w" world)
-      [(["north"] :seq)] (try-to-move player-name "n" world)
-      [(["south"] :seq)] (try-to-move player-name "s" world)
-      [(["east"] :seq)] (try-to-move player-name "e" world)
-      [(["west"] :seq)] (try-to-move player-name "w" world)
-      :else (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
-                    player-name
-                    command))))
+                           (map str/lower-case))
+        m1
+        (match [command-words]
+          [(["help"] :seq)] help
+          [(["help" "me"] :seq)] help
+          [(["i" "need" "help"] :seq)] help
+          [(["hi"] :seq)] (format "Hello, %s!" player-name)
+          [(["hello"] :seq)] (format "Hello, %s!" player-name)
+          [(["hi" "there"] :seq)] (format "Hello, %s!" player-name)
+          [(["hello" "there"] :seq)] (format "Hello, %s!" player-name)
+          [(["hi"] :seq)] (format "Hello, %s!" player-name)
+          [(["hello"] :seq)] (format "Hello, %s!" player-name)
+          [(["look"] :seq)] (m/describe-player-location player-name
+                                                        @world
+                                                        :detailed)
+          [(["look" "around"] :seq)] (m/describe-player-location player-name
+                                                                 @world
+                                                                 :detailed)
+          [(["dump" "world"] :seq)] (dump-state world)
+          [(["show" "game" "state"] :seq)] (dump-state world)
+          [(["dump" "world"] :seq)] (dump-state world)
+          [(["dump"] :seq)] (dump-state world)
+          [(["time"] :seq)] (get-time)
+          [(["current" "time"] :seq)] (get-time)
+          [(["show" "current" "time"] :seq)] (get-time)
+          [(["what" "is" "current" "time"] :seq)] (get-time)
+          :else nil)]
+    (or
+     m1
+     ;; Continue in separate match clause, else Bikeshed on Ubuntu chokes!
+     (match [command-words]
+       [(["say" & something] :seq)] (say player-name something)
+       [(["tell" "everyone" & something] :seq)] (say player-name something)
+       [(["time"] :seq)] (get-time)
+       [(["go" direction] :seq)] (try-to-move player-name direction world)
+       [(["go" "to" direction] :seq)]
+       (try-to-move player-name direction world)
+       ;; FIXME: :or clause?
+       [(["n"] :seq)] (try-to-move player-name "n" world)
+       [(["s"] :seq)] (try-to-move player-name "s" world)
+       [(["e"] :seq)] (try-to-move player-name "e" world)
+       [(["w"] :seq)] (try-to-move player-name "w" world)
+       [(["north"] :seq)] (try-to-move player-name "n" world)
+       [(["south"] :seq)] (try-to-move player-name "s" world)
+       [(["east"] :seq)] (try-to-move player-name "e" world)
+       [(["west"] :seq)] (try-to-move player-name "w" world)
+       :else
+       (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
+               player-name
+               command)))))
 
 (defn is-quit? [cmd]
   (= cmd "quit"))
