@@ -4,7 +4,7 @@
             [clojure.core.match :refer [match]]
             [clojure.core.server :as server]
             [clojure.java.io :as io]
-            [clojure.pprint :refer [pprint]]
+            [clojure.pprint :as pprint]
             [clojure.string :as str]
             [tableworld.model :as m]
             [tableworld.parse :as parse]))
@@ -61,7 +61,8 @@
 ")
 
 (defn dump-state [world]
-  (pprint [@stdouts @world]))
+  (pprint/pprint [@stdouts @world])
+  "Done.")
 
 (defn get-time []
   (str "Current time is: " (java.util.Date.)))
@@ -104,6 +105,7 @@
                                                                  :detailed)
           [(["dump" "world"] :seq)] (dump-state world)
           [(["show" "game" "state"] :seq)] (dump-state world)
+          [(["dump" "game" "state"] :seq)] (dump-state world)
           [(["dump" "world"] :seq)] (dump-state world)
           [(["dump"] :seq)] (dump-state world)
           [(["time"] :seq)] (get-time)
