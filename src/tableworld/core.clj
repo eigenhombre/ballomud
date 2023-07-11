@@ -1,6 +1,7 @@
 (ns tableworld.core
   (:gen-class)
   (:require [clj-wrap-indent.core :as wrap]
+            [clojure.core.match :refer [match]]
             [clojure.core.server :as server]
             [clojure.java.io :as io]
             [clojure.pprint :refer [pprint]]
@@ -45,10 +46,7 @@
     (broadcast player-name content)
     ""))
 
-(defn handle-command [player-name command world]
-  (let [[command & args] (str/split command #"\s")]
-    (cond
-      (= command "help") "Available:
+(def help "Available:
     dump  -- show entire game state
     hello
     help
@@ -60,29 +58,71 @@
     s     or south
     e     or east
     w     or west
-"
-      (= command "hello") (format "Hello, %s!" player-name)
-      (= command "dump") (pprint [@stdouts @world])
-      (= command "look") (m/describe-player-location player-name
-                                                     @world
-                                                     :detailed)
-      (= command "time") (str "Current time is: " (java.util.Date.))
-      (= command "say") (say player-name args)
-      (#{"e" "east"
-         "n" "north"
-         "s" "south"
-         "w" "west"} command)
-      (let [{:keys [error status]}
-            (m/try-to-move-player!
-             player-name
-             (keyword (get {"east" "e"
-                            "north" "n"
-                            "south" "s"
-                            "west" "w"} command command))
-             world)]
-        (if (= status :fail)
-          (get m/ttmp-error-descriptions error "Unknown error")
-          (m/describe-player-location player-name @world)))
+")
+
+(defn dump-state [world]
+  (pprint [@stdouts @world]))
+
+(defn get-time []
+  (str "Current time is: " (java.util.Date.)))
+
+(defn try-to-move [player-name direction-str world]
+  (let [{:keys [error status]}
+        (m/try-to-move-player!
+         player-name
+         (keyword (get {"east" "e"
+                        "north" "n"
+                        "south" "s"
+                        "west" "w"}
+                       direction-str
+                       direction-str))
+         world)]
+    (if (= status :fail)
+      (get m/ttmp-error-descriptions error "Unknown error")
+      (m/describe-player-location player-name @world))))
+
+(defn handle-command [player-name command world]
+  (let [command-words (->> (str/split command #"\s")
+                           (remove #{"the"})
+                           (map str/lower-case))]
+    (match [command-words]
+      [(["help"] :seq)] help
+      [(["help" "me"] :seq)] help
+      [(["i" "need" "help"] :seq)] help
+      [(["hi"] :seq)] (format "Hello, %s!" player-name)
+      [(["hello"] :seq)] (format "Hello, %s!" player-name)
+      [(["hi" "there"] :seq)] (format "Hello, %s!" player-name)
+      [(["hello" "there"] :seq)] (format "Hello, %s!" player-name)
+      [(["hi"] :seq)] (format "Hello, %s!" player-name)
+      [(["hello"] :seq)] (format "Hello, %s!" player-name)
+      [(["look"] :seq)] (m/describe-player-location player-name
+                                                    @world
+                                                    :detailed)
+      [(["look" "around"] :seq)] (m/describe-player-location player-name
+                                                             @world
+                                                             :detailed)
+      [(["dump" "world"] :seq)] (dump-state world)
+      [(["show" "game" "state"] :seq)] (dump-state world)
+      [(["dump" "world"] :seq)] (dump-state world)
+      [(["dump"] :seq)] (dump-state world)
+      [(["time"] :seq)] (get-time)
+      [(["current" "time"] :seq)] (get-time)
+      [(["show" "current" "time"] :seq)] (get-time)
+      [(["what" "is" "current" "time"] :seq)] (get-time)
+      [(["say" & something] :seq)] (say player-name something)
+      [(["tell" "everyone" & something] :seq)] (say player-name something)
+      [(["time"] :seq)] (get-time)
+      [(["go" direction] :seq)] (try-to-move player-name direction world)
+      [(["go" "to" direction] :seq)] (try-to-move player-name direction world)
+      ;; FIXME: :or clause?
+      [(["n"] :seq)] (try-to-move player-name "n" world)
+      [(["s"] :seq)] (try-to-move player-name "s" world)
+      [(["e"] :seq)] (try-to-move player-name "e" world)
+      [(["w"] :seq)] (try-to-move player-name "w" world)
+      [(["north"] :seq)] (try-to-move player-name "n" world)
+      [(["south"] :seq)] (try-to-move player-name "s" world)
+      [(["east"] :seq)] (try-to-move player-name "e" world)
+      [(["west"] :seq)] (try-to-move player-name "w" world)
       :else (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
                     player-name
                     command))))
