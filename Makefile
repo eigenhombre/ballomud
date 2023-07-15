@@ -1,12 +1,12 @@
 .PHONY: clean all test lint docker
 
-JAR=target/uberjar/tableworld-0.1.0-SNAPSHOT-standalone.jar
+JAR=target/uberjar/ballomud-0.1.0-SNAPSHOT-standalone.jar
 
 all: lint test uberjar
 
 uberjar: ${JAR}
 
-${JAR}: src/tableworld/*.clj resources/*
+${JAR}: src/ballomud/*.clj resources/*
 	lein uberjar
 
 test:
@@ -19,8 +19,8 @@ lint:
 	lein kibit
 
 docker:
-	docker build -t tableworld .
+	docker build -t ballomud .
 
 deploy: ${JAR}
-	rsync -vurt ../tableworld tw:
-	ssh tw 'killall java; sleep 1; cd tableworld; nohup ./tw 0.0.0.0 >/dev/null 2>&1 &'
+	rsync -vurt ../ballomud tw:
+	ssh tw 'killall java; sleep 1; cd ballomud; nohup ./tw 0.0.0.0 >/dev/null 2>&1 &'

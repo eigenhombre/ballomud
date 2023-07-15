@@ -1,4 +1,4 @@
-(ns tableworld.jail.basta
+(ns ballomud.jail.basta
   (:require [clojure.string :as str]))
 
 ;; Experiment in using Hosftadter-style expressions:

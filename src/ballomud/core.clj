@@ -1,4 +1,4 @@
-(ns tableworld.core
+(ns ballomud.core
   (:gen-class)
   (:require [clj-wrap-indent.core :as wrap]
             [clojure.core.match :refer [match]]
@@ -6,9 +6,9 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.string :as str]
-            [tableworld.model :as m]
-            [tableworld.parse :as parse]
-            [tableworld.yml :refer [world-src]]))
+            [ballomud.model :as m]
+            [ballomud.parse :as parse]
+            [ballomud.yml :refer [world-src]]))
 
 ;; For REPL hot reloading:
 (defonce live (atom false))
@@ -61,8 +61,8 @@
     w     or west
 ")
 
-(defn dump-state [world]
-  (pprint/pprint [@stdouts @world])
+(defn dump-state [thing]
+  (pprint/pprint thing)
   "Done.")
 
 (defn get-time []
@@ -86,6 +86,8 @@
       (get m/ttmp-error-descriptions error "Unknown error")
       (m/describe-player-location player-name @world))))
 
+(defn listen [] "You don't hear anything special at the moment.")
+
 (defn handle-command [player-name command world]
   (let [command-words (->> (str/split command #"\s")
                            (remove #{"the"})
@@ -107,14 +109,12 @@
           [(["look" "around"] :seq)] (m/describe-player-location player-name
                                                                  @world
                                                                  :detailed)
-          [(["dump" "world"] :seq)] (dump-state world)
-          [(["show" "game" "state"] :seq)] (dump-state world)
-          [(["dump" "game" "state"] :seq)] (dump-state world)
-          [(["dump" "world"] :seq)] (dump-state world)
-          [(["dump"] :seq)] (dump-state world)
+          [(["dump"] :seq)] (dump-state @world)
+          [(["dump" thing] :seq)] (dump-state ((keyword thing) @world))
           :else nil)
         (match [command-words]
           [(["time"] :seq)] (get-time)
+          [(["listen"] :seq)] (listen)
           [(["current" "time"] :seq)] (get-time)
           [(["show" "current" "time"] :seq)] (get-time)
           [(["what" "is" "current" "time"] :seq)] (get-time)
@@ -229,7 +229,7 @@
   (server/start-server {:name "ballomud"
                         :address host
                         :port port
-                        :accept 'tableworld.core/accept
+                        :accept 'ballomud.core/accept
                         :args [skip-intro? world]
                         :server-daemon daemon?}))
 

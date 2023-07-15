@@ -1,5 +1,5 @@
-(ns tableworld.core-test
-  (:require [tableworld.parse :as parse]
+(ns ballomud.core-test
+  (:require [ballomud.parse :as parse]
             [clojure.java.io :as io]
             [clojure.test :refer [deftest testing is]]
             [clojure.set :as set]))

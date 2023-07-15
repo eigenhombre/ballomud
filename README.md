@@ -2,7 +2,7 @@
 
 <img src="tw.jpg" width="600">
 
-![build](https://github.com/eigenhombre/tableworld/actions/workflows/build.yml/badge.svg)
+![build](https://github.com/eigenhombre/ballomud/actions/workflows/build.yml/badge.svg)
 
 A little [MUD](https://en.wikipedia.org/wiki/Multi-user_dungeon)- and
 [MUDDL](https://github.com/PDP-10/MUD1)-[inspired](https://if50.substack.com/p/1980-mud)
@@ -12,7 +12,7 @@ game.
 
 1. To play with Clojure / concurrency in the context of a multiplayer game;
 2. To explore making text-based games in the MUD heritage;
-3. To play with [plain-text representations of game worlds](https://github.com/eigenhombre/tableworld/blob/master/resources/world.yml)
+3. To play with [plain-text representations of game worlds](https://github.com/eigenhombre/ballomud/blob/master/resources/world.yml)
    along the lines of what the original MUD software used.
 
 # try it out!

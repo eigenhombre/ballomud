@@ -1,4 +1,4 @@
-(ns tableworld.model
+(ns ballomud.model
   (:require [clojure.string :as str]))
 
 (defn player-location-id [player-name world]

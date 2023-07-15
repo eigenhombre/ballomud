@@ -1,4 +1,4 @@
-(ns tableworld.parse
+(ns ballomud.parse
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.walk :as walk]))

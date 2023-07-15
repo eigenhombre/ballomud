@@ -1,4 +1,4 @@
-(ns tableworld.yml
+(ns ballomud.yml
   (:require [clj-yaml.core :as yaml]
             [clojure.java.io :as io]
             [clojure.walk :as walk])

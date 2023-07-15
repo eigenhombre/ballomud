@@ -1,6 +1,6 @@
-(ns tableworld.model-test
+(ns ballomud.model-test
   (:require [clojure.test :refer [deftest is]]
-            [tableworld.model :refer :all]))
+            [ballomud.model :refer :all]))
 
 (def example-world
   (atom {:rooms

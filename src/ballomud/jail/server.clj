@@ -1,4 +1,4 @@
-(ns tableworld.jail.server
+(ns ballomud.jail.server
   (:require [clojure.java.io :as io])
   (:import [java.net ServerSocket]
            [java.nio.channels SocketChannel]))

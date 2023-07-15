@@ -1,3 +1,7 @@
+things:
+  flashlight:
+    shortdesc: "a small, silver flashlight"
+
 rooms:
   hearth:
     shortdesc: "The hearth."
@@ -5,6 +9,8 @@ rooms:
         You are in the hearth room.  There is a heavy stone table here
         near a great fireplace lined with glazed red tile.  To the
         south lies the mud room.  There is a ladder leading up to an attic.
+    contains:
+      - flashlight
     leads_to:
         s:
           mudroom
