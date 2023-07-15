@@ -1,4 +1,4 @@
-(ns tableworld.queue
+(ns tableworld.jail.queue
   (:import [java.util.concurrent LinkedBlockingQueue]))
 
 (def event-queue (LinkedBlockingQueue.))
