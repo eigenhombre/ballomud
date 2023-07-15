@@ -10,5 +10,4 @@
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
-             :dev {:plugins [[lein-kibit "0.1.8"]
-                             [lein-bikeshed "0.1.8"]]}})
+             :dev {:plugins [[lein-kibit "0.1.8"]]}})

@@ -2,7 +2,7 @@
 
 JAR=target/uberjar/tableworld-0.1.0-SNAPSHOT-standalone.jar
 
-all: uberjar
+all: lint test uberjar
 
 uberjar: ${JAR}
 
@@ -17,7 +17,6 @@ clean:
 
 lint:
 	lein kibit
-	lein bikeshed
 
 docker:
 	docker build -t tableworld .
