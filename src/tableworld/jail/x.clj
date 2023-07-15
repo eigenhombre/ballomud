@@ -1,3 +1,0 @@
-(ns tableworld.jail.x)
-
-
