@@ -43,4 +43,6 @@
   (is (= #{ "Mary"} (room-occupants "hearth" @example-world)))
 
   (del-player! "John" example-world)
-  (is (not (player-exists "John" example-world))))
+  (is (not (player-exists "John" example-world)))
+
+  (del-player! "Mary" example-world))
