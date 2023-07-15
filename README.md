@@ -1,4 +1,4 @@
-# tableworld
+# Big Ball of MUD
 
 <img src="tw.jpg" width="600">
 
@@ -12,8 +12,7 @@ game.
 
 1. To play with Clojure / concurrency in the context of a multiplayer game;
 2. To explore making text-based games in the MUD heritage;
-3. To play with [table-based
-   worldbuilding](https://github.com/eigenhombre/tableworld/blob/master/resources/world.tw)
+3. To play with [plain-text representations of game worlds](https://github.com/eigenhombre/tableworld/blob/master/resources/world.yml)
    along the lines of what the original MUD software used.
 
 # try it out!
