@@ -4,7 +4,7 @@
 ;; Experiment in using Hosftadter-style expressions:
 ;; http://johnj.com/posts/oodles/
 
-(def rooms (atom {}))
+(def world (atom {:rooms {} :map {}}))
 
 (defn terminal? [s]
   (.endsWith (name s) "."))
@@ -80,19 +80,28 @@
 (defn sentence->str [l]
   (str/join " " (map name l)))
 
+(defn add-room! [name-str shortdesc desc directions]
+  (swap! world
+         (fn [w]
+           (-> w
+               (assoc-in [:rooms name-str]
+                         {:id name-str
+                          :shortdesc shortdesc
+                          :desc desc})
+               (assoc-in [:map name-str]
+                         {:id name-str
+                          :neighbors directions})))))
+
 (defn addroom [name-str expr-list]
   (let [sentences-list (sentences expr-list)]
-    (swap! rooms
-           assoc
-           name-str
-           {:name name-str
-            :shortdesc (sentence->str (first sentences-list))
-            :desc (->> sentences-list
-                       rest
-                       (apply concat)
-                       (mapcat normalize-name)
-                       sentence->str)
-            :directions (find-direction-map sentences-list)})))
+    (add-room! name-str
+               (sentence->str (first sentences-list))
+               (->> sentences-list
+                    rest
+                    (apply concat)
+                    (mapcat normalize-name)
+                    sentence->str)
+               (find-direction-map sentences-list))))
 
 (defmacro defroom [name_ & expr]
   `(do
@@ -104,7 +113,7 @@
   (The great forest.
        You are in the woods.  Trunks and heavy overgrowth obscure
        your view in all directions.  Just to the NORTH is a small
-       HUT, with door ajar.  To the south lies A_DEEPER_FOREST.))
+       hut MUD_ROOM, with door ajar.  To the SOUTH lies A_DEEPER_FOREST.))
 
 (defroom HEARTH
   (The hearth.
@@ -115,7 +124,7 @@
 (defroom MUD_ROOM
   (The mud room.
        You are in the mud room.  Through the outside door to the
-       SOUTH you see a great WOOD.  An opening on the NORTH side
+       SOUTH you see a great FOREST.  An opening on the NORTH side
        leads to the HEARTH.))
 
 (defroom A_DEEPER_FOREST

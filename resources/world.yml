@@ -1,0 +1,58 @@
+rooms:
+  hearth:
+    shortdesc: "The hearth."
+    desc: >
+        You are in the hearth room.  There is a heavy stone table here
+        near a great fireplace lined with glazed red tile.  To the
+        south lies the mud room.  There is a ladder leading up to an attic.
+    leads_to:
+        s:
+          mudroom
+        u:
+          attic
+  attic:
+    shortdesc: "The attic."
+    desc: >
+        You are in the attic.  There is a small window to the south.
+        There is a ladder leading down to the hearth.
+    leads_to:
+        d:
+          hearth
+  mudroom:
+    shortdesc: "The mud room."
+    desc: >
+        You are in the mud room.  Through the outside door to the
+        south you see a great wood.  The doorway on the north side
+        opens to the hearth.
+    leads_to:
+        n:
+          hearth
+        s:
+          forest
+  forest:
+    shortdesc: "The great forest."
+    desc: >
+        You are in the woods.  Trunks and heavy overgrowth obscure
+        your view in all directions.  Just to the north is a small
+        hut, with door ajar.
+    leads_to:
+        s:
+          deepforest
+        n:
+          mudroom
+  deepforest:
+    shortdesc: "The deep forest."
+    desc: >
+        You are in the deep woods.  The trees are so thick here that
+        you can barely see the sky.  The forest continues in all
+        directions.  Brush and vines grow and dangle all about you.
+        The forest is somewhat less dense to the north.
+    leads_to:
+        n:
+          forest
+        s:
+          deepforest
+        e:
+          deepforest
+        w:
+          deepforest

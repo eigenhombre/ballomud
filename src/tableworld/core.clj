@@ -7,7 +7,8 @@
             [clojure.pprint :as pprint]
             [clojure.string :as str]
             [tableworld.model :as m]
-            [tableworld.parse :as parse]))
+            [tableworld.parse :as parse]
+            [tableworld.yml :refer [world-src]]))
 
 ;; For REPL hot reloading:
 (defonce live (atom false))
@@ -74,7 +75,10 @@
          (keyword (get {"east" "e"
                         "north" "n"
                         "south" "s"
-                        "west" "w"}
+                        "west" "w"
+                        "up" "u"
+                        "down" "d"
+                        "dwn" "d"}
                        direction-str
                        direction-str))
          world)]
@@ -85,57 +89,55 @@
 (defn handle-command [player-name command world]
   (let [command-words (->> (str/split command #"\s")
                            (remove #{"the"})
-                           (map str/lower-case))
-        m1
-        (match [command-words]
-          [(["help"] :seq)] help
-          [(["help" "me"] :seq)] help
-          [(["i" "need" "help"] :seq)] help
-          [(["hi"] :seq)] (format "Hello, %s!" player-name)
-          [(["hello"] :seq)] (format "Hello, %s!" player-name)
-          [(["hi" "there"] :seq)] (format "Hello, %s!" player-name)
-          [(["hello" "there"] :seq)] (format "Hello, %s!" player-name)
-          [(["hi"] :seq)] (format "Hello, %s!" player-name)
-          [(["hello"] :seq)] (format "Hello, %s!" player-name)
-          [(["look"] :seq)] (m/describe-player-location player-name
-                                                        @world
-                                                        :detailed)
-          [(["look" "around"] :seq)] (m/describe-player-location player-name
-                                                                 @world
-                                                                 :detailed)
-          [(["dump" "world"] :seq)] (dump-state world)
-          [(["show" "game" "state"] :seq)] (dump-state world)
-          [(["dump" "game" "state"] :seq)] (dump-state world)
-          [(["dump" "world"] :seq)] (dump-state world)
-          [(["dump"] :seq)] (dump-state world)
-          [(["time"] :seq)] (get-time)
-          [(["current" "time"] :seq)] (get-time)
-          [(["show" "current" "time"] :seq)] (get-time)
-          [(["what" "is" "current" "time"] :seq)] (get-time)
-          :else nil)]
-    (or
-     m1
-     ;; Continue in separate match clause, else Bikeshed on Ubuntu chokes!
-     (match [command-words]
-       [(["say" & something] :seq)] (say player-name something)
-       [(["tell" "everyone" & something] :seq)] (say player-name something)
-       [(["time"] :seq)] (get-time)
-       [(["go" direction] :seq)] (try-to-move player-name direction world)
-       [(["go" "to" direction] :seq)]
-       (try-to-move player-name direction world)
-       ;; FIXME: :or clause?
-       [(["n"] :seq)] (try-to-move player-name "n" world)
-       [(["s"] :seq)] (try-to-move player-name "s" world)
-       [(["e"] :seq)] (try-to-move player-name "e" world)
-       [(["w"] :seq)] (try-to-move player-name "w" world)
-       [(["north"] :seq)] (try-to-move player-name "n" world)
-       [(["south"] :seq)] (try-to-move player-name "s" world)
-       [(["east"] :seq)] (try-to-move player-name "e" world)
-       [(["west"] :seq)] (try-to-move player-name "w" world)
-       :else
-       (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
-               player-name
-               command)))))
+                           (map str/lower-case))]
+    (match [command-words]
+      [(["help"] :seq)] help
+      [(["help" "me"] :seq)] help
+      [(["i" "need" "help"] :seq)] help
+      [(["hi"] :seq)] (format "Hello, %s!" player-name)
+      [(["hello"] :seq)] (format "Hello, %s!" player-name)
+      [(["hi" "there"] :seq)] (format "Hello, %s!" player-name)
+      [(["hello" "there"] :seq)] (format "Hello, %s!" player-name)
+      [(["hi"] :seq)] (format "Hello, %s!" player-name)
+      [(["hello"] :seq)] (format "Hello, %s!" player-name)
+      [(["look"] :seq)] (m/describe-player-location player-name
+                                                    @world
+                                                    :detailed)
+      [(["look" "around"] :seq)] (m/describe-player-location player-name
+                                                             @world
+                                                             :detailed)
+      [(["dump" "world"] :seq)] (dump-state world)
+      [(["show" "game" "state"] :seq)] (dump-state world)
+      [(["dump" "game" "state"] :seq)] (dump-state world)
+      [(["dump" "world"] :seq)] (dump-state world)
+      [(["dump"] :seq)] (dump-state world)
+      [(["time"] :seq)] (get-time)
+      [(["current" "time"] :seq)] (get-time)
+      [(["show" "current" "time"] :seq)] (get-time)
+      [(["what" "is" "current" "time"] :seq)] (get-time)
+      [(["say" & something] :seq)] (say player-name something)
+      [(["tell" "everyone" & something] :seq)] (say player-name something)
+      [(["time"] :seq)] (get-time)
+      [(["go" direction] :seq)] (try-to-move player-name direction world)
+      [(["go" "to" direction] :seq)]
+      (try-to-move player-name direction world)
+      ;; FIXME: :or clause?
+      [(["n"] :seq)] (try-to-move player-name "n" world)
+      [(["s"] :seq)] (try-to-move player-name "s" world)
+      [(["e"] :seq)] (try-to-move player-name "e" world)
+      [(["w"] :seq)] (try-to-move player-name "w" world)
+      [(["u"] :seq)] (try-to-move player-name "u" world)
+      [(["d"] :seq)] (try-to-move player-name "d" world)
+      [(["north"] :seq)] (try-to-move player-name "n" world)
+      [(["south"] :seq)] (try-to-move player-name "s" world)
+      [(["east"] :seq)] (try-to-move player-name "e" world)
+      [(["west"] :seq)] (try-to-move player-name "w" world)
+      [(["up"] :seq)] (try-to-move player-name "u" world)
+      [(["down"] :seq)] (try-to-move player-name "d" world)
+      :else
+      (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
+              player-name
+              command))))
 
 (defn is-quit? [cmd]
   (= cmd "quit"))
@@ -228,9 +230,22 @@
                         :args [skip-intro? world]
                         :server-daemon daemon?}))
 
+(defn check-all-directions
+  "
+  Run this after all definitions to look for consistency errors.
+  "
+  [world]
+  (doseq [[place m] (:map world)
+          [dir dest] (:neighbors m)]
+    (assert (get (:rooms world) dest)
+            (format "%s is not a known room!" dest))))
+
 (defn- main [host port daemon? skip-intro?]
-  (let [world (atom
-               (parse/parse-world (slurp (io/resource "world.tw"))))]
+  (let [world (atom (world-src))
+        #_basta/world
+        #_(atom
+           (parse/parse-world (slurp (io/resource "world.tw"))))]
+    (check-all-directions @world)
     (print
      (format "Server name: '%s'  port: %d.  Accepting connections...."
              host port))
@@ -245,5 +260,6 @@
 (when @live
   #_(pprint @(atom
               (parse/parse-world (slurp (io/resource "world.tw")))))
+  (check-all-directions (world-src))
   (server/stop-server "tableworld")
   (main "localhost" 9999 true true))

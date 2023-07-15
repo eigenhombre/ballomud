@@ -4,6 +4,7 @@
   :license {:name "MIT"}
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [clj-wrap-indent "1.0.0"]
+                 [clj-commons/clj-yaml "1.0.26"]
                  [org.clojure/core.match "1.0.1"]]
   :main ^:skip-aot tableworld.core
   :target-path "target/%s"

@@ -27,10 +27,12 @@
         others (map #(str/split (str/trim %) #"\s+") lines)]
     [room
      {:id room
-      :neighbors (walk/keywordize-keys
-                  (into {}
-                        (map (comp vec reverse) (cons (rest neighbors)
-                                                      (map rest others)))))}]))
+      :neighbors (->> others
+                      (map rest)
+                      (cons (rest neighbors))
+                      (map (comp vec reverse))
+                      (into {})
+                      walk/keywordize-keys)}]))
 
 (defn- parse-map [map-string]
   (->> (str/split map-string #"\n")

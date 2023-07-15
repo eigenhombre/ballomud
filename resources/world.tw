@@ -26,17 +26,17 @@ deepforest
 
 # Map
 
-hearth     n mudroom    s
+hearth     n mudroom    south
 
-mudroom    n hearth     n
-           n forest     s
+mudroom    n hearth     north
+           n forest     south
 
-forest     n mudroom    n
-           n deepforest s
-           n deepforest e
-           n deepforest w
+forest     n mudroom    north
+           n deepforest south
+           n deepforest east
+           n deepforest west
 
-deepforest n deepforest s
-           n forest     n
-           n deepforest e
-           n deepforest w
+deepforest n deepforest south
+           n forest     north
+           n deepforest east
+           n deepforest west
