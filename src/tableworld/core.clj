@@ -171,7 +171,7 @@
 
 (defn do-player-loop [out player-name world]
   (swap! stdouts assoc player-name out)
-  (printf "Welcome to Table World, %s.\n" player-name)
+  (printf "Welcome to BalloMUD, %s.\n" player-name)
   (m/add-player! player-name "hearth" world)
   (println (wrap (m/describe-player-location player-name
                                              @world
@@ -226,7 +226,7 @@
           (do-player-loop *out* player-name world))))))
 
 (defn start-server [host port daemon? skip-intro? world]
-  (server/start-server {:name "tableworld"
+  (server/start-server {:name "ballomud"
                         :address host
                         :port port
                         :accept 'tableworld.core/accept
@@ -264,5 +264,5 @@
   #_(pprint @(atom
               (parse/parse-world (slurp (io/resource "world.tw")))))
   (check-all-directions (world-src))
-  (server/stop-server "tableworld")
+  (server/stop-server "ballomud")
   (main "localhost" 9999 true true))

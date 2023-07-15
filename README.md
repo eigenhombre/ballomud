@@ -41,18 +41,19 @@ package manager.  Then,
     $ telnet 127.0.0.1 9999
     Trying 127.0.0.1...
     Connected to localhost.
+
     Escape character is '^]'.
     .....:::::........................................
-    .......:^^:....................................... T
+    .......:^^:....................................... B
     ......::::^::..................................... A
-    ......::::^...:................................... B
+    ......::::^...:................................... L
     .........^^::..................................... L
-    .........~:............^!~:....................... E
-    ........^P:.......:^75#&@@&BY~:................... W
-    ........?57...:~?G&@@@@@@@@@@@&B57^:.............. O
-    ........~7!!YB&@@@@@@@&~~~7&@@@@@@@#P?~:.......... R
-    ......^?G&@@@@@@@@@@@@B...^G@@@@@@@@@@@&GJ~:...... L
-    .....^P@@@@@@@@@@@@@@@B!7?PG&@@@@@@@&&&@@@G!...... D
+    .........~:............^!~:....................... O
+    ........^P:.......:^75#&@@&BY~:................... M
+    ........?57...:~?G&@@@@@@@@@@@&B57^:.............. U
+    ........~7!!YB&@@@@@@@&~~~7&@@@@@@@#P?~:.......... D
+    ......^?G&@@@@@@@@@@@@B...^G@@@@@@@@@@@&GJ~:......
+    .....^P@@@@@@@@@@@@@@@B!7?PG&@@@@@@@&&&@@@G!......
     .:~^^~J@@@B&@@@@@@@@@&@@@@@&@@@@@@@@@&GG&@G.......
     :~!~~75#&#5&@&@@@@@@@@@@@@@&&#@@@&&@@@&&@@&^......
     :^^^^?5@@#5&@#&&&#&&&&&&&&@@@@@#&&&&&BPG#&@~.:::.:
@@ -63,17 +64,17 @@ package manager.  Then,
     &#&@@@&J~^~~!~~~~~~!~~^~~!!~~~~~~~?5BBB&##&#GG#&&&
     @@@@@@@B7^^!!~~^^^^^^^^^^^^^^^^^^^~?J?YBGGP5P&@&&#
     @@@@@@@&YYJY~^^~^~~~~^^^^^:^^^^^^^~~~!??JJ?Y&@&&&&
-             https://github.com/eigenhombre/tableworld
+               https://github.com/eigenhombre/ballomud
 
       Welcome to the world.
 
-    Are you a bot?  Type 'n' or 'no' if not... n
-    What is your name? Otter
-    Welcome to Table World, Otter.
+    Are you a bot?  Type 'n' or 'no' if not... no
+    What is your name? Margoloth
+    Welcome to Ballomud, Margoloth.
       You are in the hearth room.  There is a heavy
       stone table here near a great fireplace lined
       with glazed red tile.  To the south lies the mud
-      room.
+      room.  There is a ladder leading up to an attic.
 
       Also here: John.
     >>> say Hello, everyone.
