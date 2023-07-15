@@ -122,5 +122,3 @@
   (The deep forest.
        You are in the deep forest.  Brush and vines grow and dangle
        all about you.  To the NORTH the FOREST is somewhat less dense.))
-
-(clojure.pprint/pprint @rooms)
