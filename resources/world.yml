@@ -1,7 +1,9 @@
 things:
   flashlight:
     shortdesc: "a small, silver flashlight"
-
+    desc: >
+        A small, silver flashlight, slightly tarnished.  It is turned
+        off.
 rooms:
   hearth:
     shortdesc: "The hearth."

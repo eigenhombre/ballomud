@@ -88,12 +88,36 @@
 
 (defn listen [] "You don't hear anything special at the moment.")
 
+(defn look-at [player-name thingwords world-map]
+  ;; FIXME: improve so that you can either supply the thing name,
+  ;; or the short description of the thing.
+  (let [room-id (m/player-location-id player-name world-map)
+        room (when room-id (get-in world-map [:rooms room-id]))
+        room-things (when room (:contains room))
+        thing (str/join " " thingwords)]
+    (if-not (some #{thing} room-things)
+      (format "You don't see '%s' here." thing)
+      (get-in world-map
+              [:things (keyword thing) :desc]
+              "It looks really cool."))))
+
+(defn open [player-name thingwords world]
+  "You can't open that at the moment.")
+
 (defn handle-command [player-name command world]
+  (when-not (= command ".")
+    (swap! world assoc-in [:players player-name :last-command] command))
   (let [command-words (->> (str/split command #"\s")
                            (remove #{"the"})
                            (map str/lower-case))]
     ;; Workaround for https://clojure.atlassian.net/browse/CLJ-1852:
     (or (match [command-words]
+          [(["."] :seq)] (handle-command player-name
+                                         (get-in @world
+                                                 [:players
+                                                  player-name
+                                                  :last-command])
+                                         world)
           [(["help"] :seq)] help
           [(["help" "me"] :seq)] help
           [(["i" "need" "help"] :seq)] help
@@ -109,6 +133,13 @@
           [(["look" "around"] :seq)] (m/describe-player-location player-name
                                                                  @world
                                                                  :detailed)
+          [(["look" "at" & something] :seq)] (look-at player-name
+                                                      something
+                                                      @world)
+          [(["open" & something] :seq)] (open player-name
+                                              something
+                                              world)
+
           [(["dump"] :seq)] (dump-state @world)
           [(["dump" thing] :seq)] (dump-state ((keyword thing) @world))
           :else nil)
@@ -137,6 +168,7 @@
           [(["west"] :seq)] (try-to-move player-name "w" world)
           [(["up"] :seq)] (try-to-move player-name "u" world)
           [(["down"] :seq)] (try-to-move player-name "d" world)
+          [(["who"] :seq)] (str (str/join ", " (keys (:players @world))) ".")
           :else
           (format "Sorry, %s, I don't understand '%s'. Type 'help' for help."
                   player-name
