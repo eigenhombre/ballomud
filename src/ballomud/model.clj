@@ -22,13 +22,24 @@
        (map :name)
        (into #{})))
 
+
+(defn lookup-thing-by-name [world-map nom]
+  (:shortdesc ((:things world-map) (keyword nom))))
+
 (defn describe-player-location-full [player-name world-map]
   (let [room-id (player-location-id player-name world-map)
         occupants (remove #{player-name} (room-occupants room-id world-map))
-        desc (:desc (player-room player-name world-map))]
-    (if (seq occupants)
-      (str desc "\n\nAlso here: " (str/join ", " occupants) ".")
-      desc)))
+        room (player-room player-name world-map)
+        desc (:desc room)
+        things (map (partial lookup-thing-by-name world-map) (:contains room))
+        desc2 (if (seq things)
+                (str desc "\nYou see here: " (str/join "; " things) ".")
+                desc)
+        desc3 (if (seq occupants)
+                (str desc2 "\n\nAlso here: " (str/join ", " occupants) ".")
+                desc2)]
+
+    desc3))
 
 (defn describe-player-location
   ([player-name world-map]
