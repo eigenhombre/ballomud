@@ -1,4 +1,4 @@
-(ns ballomud.yml
+(ns ballomud.reader
   (:require [clj-yaml.core :as yaml]
             [clojure.java.io :as io]
             [clojure.walk :as walk])
@@ -29,10 +29,8 @@
                   (for [[k v] rooms]
                     [(name k) (assoc v :id (name k))])))))
 
-(defn world-src []
-  (->> "world.yml"
-       io/resource
-       slurp
+(defn read-from-string [s]
+  (->> s
        read-world-source
        keywordize-room-names
        add-map-map))

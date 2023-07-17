@@ -1,23 +1,18 @@
 (ns ballomud.core
   (:gen-class)
-  (:require [clj-wrap-indent.core :as wrap]
+  (:require [ballomud.model :as m]
+            [ballomud.reader :as reader]
+            [ballomud.util :as util]
+            [clj-wrap-indent.core :as wrap]
             [clojure.core.match :refer [match]]
             [clojure.core.server :as server]
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
-            [clojure.string :as str]
-            [ballomud.model :as m]
-            [ballomud.parse :as parse]
-            [ballomud.yml :refer [world-src]]))
+            [clojure.string :as str]))
 
 ;; For REPL hot reloading:
 (defonce live (atom false))
 (comment (reset! live true))
-
-(defn- remove-edge-quotes [s]
-  (-> s
-      (str/replace #"^(?:\'|\")" "")
-      (str/replace #"(?:\'|\")$" "")))
 
 (def stdouts (atom {}))
 
@@ -42,7 +37,7 @@
 
 (defn say [player-name args]
   (let [content (->> args
-                     (map remove-edge-quotes)
+                     (map util/remove-edge-quotes)
                      (str/join " "))]
     (broadcast player-name content)
     ""))
@@ -275,11 +270,14 @@
     (assert (get (:rooms world) dest)
             (format "%s is not a known room!" dest))))
 
+(defn world-src []
+  (->> "world.yml"
+       io/resource
+       slurp
+       reader/read-from-string))
+
 (defn- main [host port daemon? skip-intro?]
-  (let [world (atom (world-src))
-        #_basta/world
-        #_(atom
-           (parse/parse-world (slurp (io/resource "world.tw"))))]
+  (let [world (atom (world-src))]
     (check-all-directions @world)
     (print
      (format "Server name: '%s'  port: %d.  Accepting connections...."
@@ -293,8 +291,6 @@
     (main host port false false)))
 
 (when @live
-  #_(pprint @(atom
-              (parse/parse-world (slurp (io/resource "world.tw")))))
   (check-all-directions (world-src))
   (server/stop-server "ballomud")
   (main "localhost" 9999 true true))
