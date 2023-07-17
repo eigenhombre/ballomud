@@ -10,7 +10,7 @@ ${JAR}: src/ballomud/*.clj resources/*
 	lein uberjar
 
 test:
-	lein test
+	lein cloverage
 
 clean:
 	rm -rf target
