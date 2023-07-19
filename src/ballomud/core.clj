@@ -45,8 +45,12 @@
 (def help "Available:
     dump  -- show entire game state
     hello
+    take <thing>  ...or...  pick up <thing>
+    drop <thing>  ...or...  put down <thing>
+    inventory
     help
     look  -- describe where you are
+    look at <thing>
     quit
     say   -- tell something to everyone
     time  -- get current time
@@ -99,6 +103,21 @@
 (defn open [player-name thingwords world]
   "You can't open that at the moment.")
 
+(defn inventory [player-name world]
+  "You are not carrying anything at the moment.")
+
+(defn pick-up [player-name thing world]
+  (let [{:keys [error status]} (m/try-to-pick-up! player-name thing world)]
+    (if (= status :fail)
+      (get m/ttmp-error-descriptions error "Unknown error")
+      "You have it!")))
+
+(defn drop-thing [player-name thing world]
+  (let [{:keys [error status]} (m/try-to-drop! player-name thing world)]
+    (if (= status :fail)
+      (get m/ttmp-error-descriptions error "Unknown error")
+      "Dropped.")))
+
 (defn handle-command [player-name command world]
   (when-not (= command ".")
     (swap! world assoc-in [:players player-name :last-command] command))
@@ -134,7 +153,10 @@
           [(["open" & something] :seq)] (open player-name
                                               something
                                               world)
-
+          [(["take" something] :seq)] (pick-up player-name something world)
+          [(["pick" "up" something] :seq)] (pick-up player-name something world)
+          [(["drop" something] :seq)] (drop-thing player-name something world)
+          [(["put" "down" something] :seq)] (drop-thing player-name something world)
           [(["dump"] :seq)] (dump-state @world)
           [(["dump" thing] :seq)] (dump-state ((keyword thing) @world))
           :else nil)
@@ -147,6 +169,8 @@
           [(["say" & something] :seq)] (say player-name something)
           [(["tell" "everyone" & something] :seq)] (say player-name something)
           [(["time"] :seq)] (get-time)
+          [(["inventory"] :seq)] (inventory player-name world)
+          [(["i"] :seq)] (inventory player-name world)
           [(["go" direction] :seq)] (try-to-move player-name direction world)
           [(["go" "to" direction] :seq)]
           (try-to-move player-name direction world)
