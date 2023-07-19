@@ -1,6 +1,7 @@
 (ns ballomud.core
   (:gen-class)
   (:require [ballomud.model :as m]
+            [ballomud.npc :as n]
             [ballomud.reader :as reader]
             [ballomud.util :as util]
             [clj-wrap-indent.core :as wrap]
@@ -306,8 +307,17 @@
        slurp
        reader/read-from-string))
 
+(defn add-npcs
+  ([world-map]
+   (let [n (rand-int (rand-int (inc (rand-int 50))))]
+     (add-npcs n world-map)))
+  ([n world-map]
+   (if (zero? n)
+     world-map
+     (add-npcs (dec n) (m/add-npc (n/npc-name) world-map)))))
+
 (defn- main [host port daemon? skip-intro?]
-  (let [world (atom (world-src))]
+  (let [world (atom (add-npcs (world-src)))]
     (check-all-directions @world)
     (print
      (format "Server name: '%s'  port: %d.  Accepting connections...."

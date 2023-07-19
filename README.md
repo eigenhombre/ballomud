@@ -6,7 +6,7 @@
 
 A little [MUD](https://en.wikipedia.org/wiki/Multi-user_dungeon)- and
 [MUDDL](https://github.com/PDP-10/MUD1)-[inspired](https://if50.substack.com/p/1980-mud)
-game.
+multiplayer text game.
 
 # goals
 
@@ -14,6 +14,19 @@ game.
 2. To explore making text-based games in the MUD heritage;
 3. To play with [plain-text representations of game worlds](https://github.com/eigenhombre/ballomud/blob/master/resources/world.yml)
    along the lines of what the original MUD software used.
+
+# features / actions
+
+This is a "[sandbox](https://en.wikipedia.org/wiki/Sandbox_game)" text
+game in progress with limited features so far:
+
+- YML-based initial world state
+- Move from room to room via (currently) six directions
+- Pick up and drop things
+- Talk out loud
+- Look around or at things
+- Look at the entire game state(!)
+- NPCs (that don't do anything yet)
 
 # try it out!
 

@@ -60,6 +60,12 @@
                           (assoc-in [:players player-name :is-new-location?]
                                     true)))))
 
+(defn add-npc [npc-name world-map]
+  (let [room-id (rand-nth (map first (:rooms world-map)))]
+    (-> world-map
+        (->> (assoc-player-room npc-name room-id))
+        (assoc-in [:players npc-name :is-npc?] true))))
+
 (defn del-player! [player-name world-atom]
   (swap! world-atom update :players dissoc player-name))
 
