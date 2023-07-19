@@ -50,6 +50,7 @@
   (is (= {:error :player-not-there
           :status :fail}
          (try-to-pick-up! "Frodo" "flashlight" example-world)))
+  (is (= {} (player-inventory "John" @example-world)))
 
   (add-player! "Mary" "hearth" example-world)
   (is (= #{ "Mary"} (room-occupants "hearth" @example-world)))
@@ -58,6 +59,8 @@
   (is (= {:error nil
           :status :ok}
          (try-to-pick-up! "Mary" "flashlight" example-world)))
+  (is (= {"flashlight" "a small, silver flashlight"}
+         (player-inventory "Mary" @example-world)))
   (is (empty? (room-contents "hearth" @example-world)))
   (is (= {:error nil
           :status :ok}

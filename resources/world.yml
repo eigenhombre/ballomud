@@ -4,6 +4,10 @@ things:
     desc: >
         A small, silver flashlight, slightly tarnished.  It is turned
         off.
+  brick:
+    shortdesc: "a red brick"
+    desc: >
+        A red brick, somewhat weathered.
 rooms:
   hearth:
     shortdesc: "The hearth."
@@ -23,6 +27,8 @@ rooms:
     desc: >
         You are in the attic.  There is a small window to the south.
         There is a ladder leading down to the hearth.
+    contains:
+      - brick
     leads_to:
         d:
           hearth

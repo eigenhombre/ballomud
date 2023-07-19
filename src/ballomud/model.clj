@@ -104,7 +104,9 @@
                                (not visited?)))))))))
 
 (defn player-inventory [player-name world-map]
-  (get-in world-map [:players player-name :inventory] []))
+  (let [obj-ids (get-in world-map [:players player-name :inventory] [])]
+    (into {} (for [id obj-ids]
+               [id (get-in world-map [:things (keyword id) :shortdesc])]))))
 
 (defn room-contents [room-name world-map]
   (get-in world-map [:rooms room-name :contains] []))
@@ -133,7 +135,8 @@
      (fn [world]
        (let [loc (player-location-id player-name world)
              has-object (boolean (some #{object}
-                                       (player-inventory player-name world)))]
+                                       (keys
+                                        (player-inventory player-name world))))]
          (cond
            (not loc) (oops :player-not-there)
            (not has-object) (oops :player-does-not-have-object)

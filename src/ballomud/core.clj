@@ -104,7 +104,12 @@
   "You can't open that at the moment.")
 
 (defn inventory [player-name world]
-  "You are not carrying anything at the moment.")
+  (let [inv (m/player-inventory player-name @world)]
+    (if (empty? inv)
+      "You are not carrying anything at the moment."
+      (str "You have:\n"
+           (str/join "\n" (map (partial format "  - %s")
+                               (vals inv)))))))
 
 (defn pick-up [player-name thing world]
   (let [{:keys [error status]} (m/try-to-pick-up! player-name thing world)]
@@ -154,6 +159,7 @@
                                               something
                                               world)
           [(["take" something] :seq)] (pick-up player-name something world)
+          [(["get" something] :seq)] (pick-up player-name something world)
           [(["pick" "up" something] :seq)] (pick-up player-name something world)
           [(["drop" something] :seq)] (drop-thing player-name something world)
           [(["put" "down" something] :seq)] (drop-thing player-name something world)
