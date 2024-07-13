@@ -1,4 +1,4 @@
-FROM adoptopenjdk:11-jre-hotspot
+FROM sapmachine
 
 RUN apt-get -y update
 RUN apt-get -y upgrade

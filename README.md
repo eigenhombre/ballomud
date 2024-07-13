@@ -1,6 +1,6 @@
 # Big Ball of MUD
 
-<img src="tw.jpg" width="600">
+<img src="ballomud.jpg" width="600">
 
 ![build](https://github.com/eigenhombre/ballomud/actions/workflows/build.yml/badge.svg)
 
@@ -43,7 +43,7 @@ package manager.  Then,
 
 # running a local copy
 
-    ./tw
+    ./mud
 
 # playing your local copy
 

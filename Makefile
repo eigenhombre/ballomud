@@ -2,7 +2,9 @@
 
 JAR=target/uberjar/ballomud-0.1.0-SNAPSHOT-standalone.jar
 
-all: lint test uberjar
+default: uberjar
+
+all: clean uberjar lint test docker
 
 uberjar: ${JAR}
 
