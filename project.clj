@@ -20,5 +20,6 @@
                              [lein-cloverage "1.2.4"]]}}
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
-                  ["vcs" "commit"]]
-  )
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "v" "--no-sign"]
+                  ])
