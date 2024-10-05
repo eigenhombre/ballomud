@@ -1,12 +1,12 @@
 (ns ballomud.model
   (:require [clojure.string :as str]))
 
-(defn player-location-id [player-name world]
-  (get-in world [:players player-name :location]))
+(defn player-location-id [player-name world-state]
+  (get-in world-state [:players player-name :location]))
 
-(defn player-room [player-name world]
-  (let [loc-id (player-location-id player-name world)]
-    (get-in world [:rooms loc-id])))
+(defn player-room [player-name world-state]
+  (let [loc-id (player-location-id player-name world-state)]
+    (get-in world-state [:rooms loc-id])))
 
 (defn assoc-player-room [player-name room-id world-map]
   (let [room (get-in world-map [:rooms room-id])]
@@ -50,8 +50,8 @@
        (describe-player-location-full player-name world-map)
        (:shortdesc (player-room player-name world-map))))))
 
-(defn player-exists [player-name world-atom]
-  (get-in @world-atom [:players player-name]))
+(defn player-exists [player-name world-state]
+  (get-in world-state [:players player-name]))
 
 (defn add-player! [player-name room-id world-atom]
   (swap! world-atom (fn [world]
@@ -158,3 +158,45 @@
    :cannot-go-that-way "You cannot go that way."
    :object-not-here "I don't see that here."
    :player-does-not-have-object "You don't have that."})
+
+(defn move-npcs!
+  "
+  Move NPCs around the world.
+  Returns a list of events that happened (currently, just strings).
+  "
+  [player-name world-atom leave-probability]
+  (let [events (atom [])]
+    (swap! world-atom
+           (fn [world]
+             (let [npcs (->> world
+                             :players
+                             (filter (comp :is-npc? second))
+                             (map first))]
+               (loop [npcs npcs
+                      world world]
+                 (if-not (seq npcs)
+                   world
+                   (let [[npc-name] npcs
+                         room-id (player-location-id npc-name world)
+                         room (get-in world [:rooms room-id])
+                         neighbors (:leads_to room)
+                         [_ new-room-id] (rand-nth (vec neighbors))
+                         player-room (player-location-id player-name world)]
+                     (if (or (> (rand) leave-probability)
+                             (= room-id new-room-id))
+                       (recur (rest npcs) world)
+                       (do
+                         #_(swap! events conj (format "%s moves from %s to %s."
+                                                      npc-name
+                                                      room-id
+                                                      new-room-id))
+                         (when (= new-room-id player-room)
+                           (swap! events conj (format "%s appears." npc-name)))
+                         (when (and (= room-id player-room)
+                                    (not= player-room new-room-id))
+                           (swap! events conj (format "%s leaves." npc-name)))
+                         (recur (rest npcs)
+                                (assoc-in world
+                                          [:players npc-name :location]
+                                          new-room-id))))))))))
+    @events))

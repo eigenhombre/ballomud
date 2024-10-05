@@ -20,11 +20,11 @@
 
 
 (deftest model
-  (is (not (player-exists "John" example-world)))
+  (is (not (player-exists "John" @example-world)))
   (is (nil? (player-room "John" @example-world)))
 
   (add-player! "John" "ship" example-world)
-  (is (player-exists "John" example-world))
+  (is (player-exists "John" @example-world))
   (is (= "A place of seasickness and spray."
          (describe-player-location "John" @example-world)))
   (is (= #{"John"} (room-occupants "ship" @example-world)))
@@ -67,6 +67,6 @@
          (try-to-drop! "Mary" "flashlight" example-world)))
 
   (del-player! "John" example-world)
-  (is (not (player-exists "John" example-world)))
+  (is (not (player-exists "John" @example-world)))
 
   (del-player! "Mary" example-world))

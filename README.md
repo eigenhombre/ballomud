@@ -8,6 +8,10 @@ A little [MUD](https://en.wikipedia.org/wiki/Multi-user_dungeon)- and
 [MUDDL](https://github.com/PDP-10/MUD1)-[inspired](https://if50.substack.com/p/1980-mud)
 multiplayer text game.
 
+The title is a play on both the original MUD idea and the [Big Ball of
+Mud](http://www.laputan.org/mud/) software architecture antipattern
+(and 1970s characterization of Lisp itself).
+
 # goals
 
 1. To play with Clojure / concurrency in the context of a multiplayer game;

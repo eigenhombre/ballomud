@@ -13,6 +13,7 @@
 
 ;; For REPL hot reloading:
 (defonce live (atom false))
+(defonce world (atom nil))
 (comment (reset! live true))
 
 (def stdouts (atom {}))
@@ -217,18 +218,41 @@
 (defn splash []
   (println (slurp (io/resource "art.txt"))))
 
-(defn do-something-random-later []
-  (future
-    (Thread/sleep (rand-int 10000))
-    (when (zero? (rand-int 3))
-      (async-println
-       (rand-nth ["You hear a soft breeze blowing."
-                  "Your stomach grumbles."
-                  "A fly buzzes unseen nearby."
-                  "Someone coughs."])))))
+(defn print-random-atmospheric! [_ _]
+  (async-println
+   (rand-nth ["You hear a soft breeze blowing."
+              "Your stomach grumbles."
+              "A fly buzzes unseen nearby."
+              "Someone coughs."])))
 
 (defn trimmed-input []
   (str/trim (or (read-line) "")))
+
+(defn move-npcs! [player-name world]
+  (doseq [event (m/move-npcs! player-name world 0.3)]
+    (async-println event)))
+
+(defn random-event [player-name world]
+  (try
+    (Thread/sleep (rand-int 10000))
+    (when (zero? (rand-int 2))
+      ((rand-nth [print-random-atmospheric!
+                  move-npcs!])
+       player-name world))
+    (catch Exception e
+      (println (str "Exception! " e))
+      (println e))))
+
+(defn maybe-do-something-random-later [player-name world]
+  (future
+    (random-event player-name world)))
+
+(defn handle-player-command [player-name command world]
+  (let [response (handle-command player-name
+                                 command
+                                 world)]
+    (println (wrap response))
+    (maybe-do-something-random-later player-name world)))
 
 (defn do-player-loop [out player-name world]
   (swap! stdouts assoc player-name out)
@@ -245,11 +269,10 @@
         (iseof command) (disconnect world player-name)
         (seq command) (if (is-quit? command)
                         (disconnect world player-name)
-                        (let [response (handle-command player-name
-                                                       command
-                                                       world)]
-                          (println (wrap response))
-                          (do-something-random-later)
+                        (do
+                          (handle-player-command player-name
+                                                 command
+                                                 world)
                           (recur)))
         :else (recur)))))
 
@@ -273,7 +296,7 @@
             (println "Sorry, no whitespace in player names (for now).")
             (recur))
 
-          (m/player-exists player-name world)
+          (m/player-exists player-name @world)
           (do
             (printf "Player name %s is taken!\n" player-name)
             (flush)
@@ -308,9 +331,11 @@
        slurp
        reader/read-from-string))
 
+(def max-npcs 50)
+
 (defn add-npcs
   ([world-map]
-   (let [n (rand-int (rand-int (inc (rand-int 50))))]
+   (let [n (inc (rand-int (rand-int (inc (rand-int max-npcs)))))]
      (add-npcs n world-map)))
   ([n world-map]
    (if (zero? n)
@@ -318,13 +343,13 @@
      (add-npcs (dec n) (m/add-npc (n/npc-name) world-map)))))
 
 (defn- main [host port daemon? skip-intro?]
-  (let [world (atom (add-npcs (world-src)))]
-    (check-all-directions @world)
-    (print
-     (format "Server name: '%s'  port: %d.  Accepting connections...."
-             host port))
-    (flush)
-    (start-server host port daemon? skip-intro? world)))
+  (reset! world (add-npcs (world-src)))
+  (check-all-directions @world)
+  (print
+   (format "Server name: '%s'  port: %d.  Accepting connections...."
+           host port))
+  (flush)
+  (start-server host port daemon? skip-intro? world))
 
 (defn -main [& [host port skip-intro?]]
   (let [host (or host "0.0.0.0")
