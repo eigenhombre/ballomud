@@ -36,3 +36,4 @@ dockerpush:
 
 release:
 	lein release
+	echo "You should `make dockerpush` now."
