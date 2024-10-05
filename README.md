@@ -34,17 +34,16 @@ game in progress with limited features so far:
 
 (May disappear or be restarted without warning....) -->
 
+# running the game
+
+    docker run -p 9999:9999 eigenhombre/ballomud
+
 # building it for yourself
 
 Install [Leiningen](https://leiningen.org/) and `make` using your
 package manager.  Then,
 
     make && ./mud
-
-# alternative: build and run with Docker
-
-    docker build -t ballomud .
-    docker run -p 9999:9999 ballomud ./mud
 
 # playing your local copy
 
