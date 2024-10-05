@@ -1,4 +1,4 @@
-(defproject ballomud "0.0.1"
+(defproject ballomud "0.0.2-SNAPSHOT"
   :description "A small MUD-inspired game"
   :url "https://github.com/eigenhombre/ballomud"
   :license {:name "MIT"}
@@ -23,4 +23,7 @@
                   ["vcs" "commit"]
                   ["vcs" "tag" "v" "--no-sign"]
                   ["uberjar"]
-                  ])
+                  ;; TODO: push to docker
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]
