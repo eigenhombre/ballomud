@@ -15,6 +15,7 @@
                  [lein-cloverage "1.2.4"]]
   :main ^:skip-aot ballomud.core
   :target-path "target/%s"
+  :uberjar-name "ballomud.jar"
   :profiles {:uberjar {:aot :all
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
              :dev {:plugins [[lein-kibit "0.1.11"]
