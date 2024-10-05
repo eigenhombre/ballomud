@@ -1,4 +1,4 @@
-.PHONY: ancient clean all test lint docker
+.PHONY: ancient clean all test lint docker dockerpush release
 
 JAR=target/uberjar/ballomud-0.1.0-SNAPSHOT-standalone.jar
 
@@ -33,3 +33,6 @@ ancient:
 # N.B.: `docker login` first:
 dockerpush:
 	docker push -a eigenhombre/ballomud
+
+release:
+	lein release
