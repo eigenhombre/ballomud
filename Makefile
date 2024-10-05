@@ -1,4 +1,4 @@
-.PHONY: clean all test lint docker
+.PHONY: ancient clean all test lint docker
 
 JAR=target/uberjar/ballomud-0.1.0-SNAPSHOT-standalone.jar
 
@@ -26,3 +26,6 @@ docker:
 deploy: ${JAR}
 	rsync -vurt ../ballomud tw:
 	ssh tw 'killall java; sleep 1; cd ballomud; nohup ./tw 0.0.0.0 >/dev/null 2>&1 &'
+
+ancient:
+	lein ancient :all

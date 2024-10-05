@@ -48,12 +48,12 @@ package manager.  Then,
 
 # playing your local copy
 
-    telnet 127.0.0.1 9999
+    telnet localhost 9999
 
 ## example
 
-    $ telnet 127.0.0.1 9999
-    Trying 127.0.0.1...
+    $ telnet localhost 9999
+    Trying ::1...
     Connected to localhost.
 
     Escape character is '^]'.

@@ -227,6 +227,9 @@
                   "A fly buzzes unseen nearby."
                   "Someone coughs."])))))
 
+(defn trimmed-input []
+  (str/trim (or (read-line) "")))
+
 (defn do-player-loop [out player-name world]
   (swap! stdouts assoc player-name out)
   (printf "Welcome to BalloMUD, %s.\n" player-name)
@@ -237,7 +240,7 @@
   (loop []
     (print ">>> ")
     (flush)
-    (let [command (str/trim (str (read-line)))]
+    (let [command (trimmed-input)]
       (cond
         (iseof command) (disconnect world player-name)
         (seq command) (if (is-quit? command)
@@ -256,16 +259,14 @@
     (print "Are you a bot?  Type 'n' or 'no' if not... ")
     (flush))
   (when (or skip-intro?
-            (#{"n" "no"} (-> (read-line)
-                             str/trim
-                             str/lower-case)))
+            (#{"n" "no"} (str/lower-case (trimmed-input))))
     (loop []
       (when-not skip-intro?
         (print "What is your name? ")
         (flush))
       (let [player-name (if skip-intro?
                           (str "Tester" (rand-int 1000))
-                          (str/trim (read-line)))]
+                          (trimmed-input))]
         (cond
           (re-find #"\s" player-name)
           (do
