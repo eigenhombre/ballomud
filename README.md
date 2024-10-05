@@ -36,7 +36,7 @@ game in progress with limited features so far:
 
 # running the game
 
-    docker run -p 9999:9999 eigenhombre/ballomud
+    docker run -it -p 9999:9999 eigenhombre/ballomud
 
 # building it for yourself
 
