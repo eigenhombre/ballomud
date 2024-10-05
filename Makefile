@@ -29,3 +29,7 @@ deploy: ${JAR}
 
 ancient:
 	lein ancient :all
+
+# N.B.: `docker login` first:
+dockerpush:
+	docker push -a eigenhombre/ballomud
