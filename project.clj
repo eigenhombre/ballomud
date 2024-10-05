@@ -17,4 +17,6 @@
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
              :dev {:plugins [[lein-kibit "0.1.11"]
                              [lein-ancient "0.7.0"]
-                             [lein-cloverage "1.2.4"]]}})
+                             [lein-cloverage "1.2.4"]]}}
+  :release-tasks [["vcs" "assert-committed"]]
+  )
