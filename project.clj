@@ -10,6 +10,7 @@
                  ;; Plugins: (for lein deps to cache correctly in Docker):
                  [lein-kibit "0.1.11"]
                  [lein-ancient "0.7.0"]
+                 [lein-pprint "1.3.2"]
                  [lein-cloverage "1.2.4"]]
   :main ^:skip-aot ballomud.core
   :target-path "target/%s"
@@ -17,13 +18,14 @@
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
              :dev {:plugins [[lein-kibit "0.1.11"]
                              [lein-ancient "0.7.0"]
+                             [lein-pprint "1.3.2"]
                              [lein-cloverage "1.2.4"]]}}
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
                   ["vcs" "commit"]
                   ["vcs" "tag" "v" "--no-sign"]
                   ["uberjar"]
-                  ;; TODO: push to docker
+                  [["shell" "./publish.sh"]]
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit"]
                   ["vcs" "push"]])
