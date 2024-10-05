@@ -28,22 +28,23 @@ game in progress with limited features so far:
 - Look at the entire game state(!)
 - NPCs (that don't do anything yet)
 
-# try it out!
+<!-- # try it out!
 
     telnet 206.189.225.15 9999
 
-(May disappear or be restarted without warning....)
+(May disappear or be restarted without warning....) -->
 
 # building it for yourself
 
 Install [Leiningen](https://leiningen.org/) and `make` using your
 package manager.  Then,
 
-    make
+    make && ./mud
 
-# running a local copy
+# alternative: build and run with Docker
 
-    ./mud
+    docker build -t ballomud .
+    docker run -p 9999:9999 ballomud ./mud
 
 # playing your local copy
 

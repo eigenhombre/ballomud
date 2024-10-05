@@ -326,7 +326,7 @@
     (start-server host port daemon? skip-intro? world)))
 
 (defn -main [& [host port skip-intro?]]
-  (let [host (or host "localhost")
+  (let [host (or host "0.0.0.0")
         port (Integer. (or port "9999"))]
     (main host port false false)))
 
