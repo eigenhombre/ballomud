@@ -9,6 +9,7 @@
                  [org.clojure/core.match "1.1.0"]
                  ;; Plugins: (for lein deps to cache correctly in Docker):
                  [lein-kibit "0.1.11"]
+                 [lein-shell "0.5.0"]
                  [lein-ancient "0.7.0"]
                  [lein-pprint "1.3.2"]
                  [lein-cloverage "1.2.4"]]
@@ -19,6 +20,7 @@
              :dev {:plugins [[lein-kibit "0.1.11"]
                              [lein-ancient "0.7.0"]
                              [lein-pprint "1.3.2"]
+                             [lein-shell "0.5.0"]
                              [lein-cloverage "1.2.4"]]}}
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
