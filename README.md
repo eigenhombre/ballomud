@@ -1,6 +1,6 @@
 # Big Ball of MUD
 
-<img src="ballomud.jpg" width="600">
+<img src="bm.jpg" width="600">
 
 ![build](https://github.com/eigenhombre/ballomud/actions/workflows/build.yml/badge.svg)
 
