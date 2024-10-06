@@ -23,17 +23,12 @@
                              [lein-pprint "1.3.2"]
                              [lein-shell "0.5.0"]
                              [lein-cloverage "1.2.4"]]}}
-  :release-tasks [;; ["vcs" "assert-committed"]
+  :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
                   ["vcs" "commit"]
                   ["vcs" "tag" "v" "--no-sign"]
                   ["uberjar"]
-                  [["shell" "echo" "pre publish"]]
-                  [["shell" "./publish.sh"]]
-                  [["shell" "echo" "post publish"]]
+                  [["shell" "./build-release.sh"]]
                   ["change" "version" "leiningen.release/bump-version"]
-                  [["shell" "echo" "bump version"]]
                   ["vcs" "commit"]
-                  [["shell" "echo" "commit"]]
-                  ["vcs" "push"]
-                  [["shell" "echo" "done"]]])
+                  ["vcs" "push"]])
