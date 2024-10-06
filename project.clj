@@ -1,4 +1,4 @@
-(defproject ballomud "0.0.9-SNAPSHOT"
+(defproject ballomud "0.0.9"
   :description "A small MUD-inspired game"
   :url "https://github.com/eigenhombre/ballomud"
   :license {:name "MIT"}
@@ -23,12 +23,17 @@
                              [lein-pprint "1.3.2"]
                              [lein-shell "0.5.0"]
                              [lein-cloverage "1.2.4"]]}}
-  :release-tasks [["vcs" "assert-committed"]
+  :release-tasks [;; ["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
                   ["vcs" "commit"]
                   ["vcs" "tag" "v" "--no-sign"]
                   ["uberjar"]
+                  [["shell" "echo" "pre publish"]]
                   [["shell" "./publish.sh"]]
+                  [["shell" "echo" "post publish"]]
                   ["change" "version" "leiningen.release/bump-version"]
+                  [["shell" "echo" "bump version"]]
                   ["vcs" "commit"]
-                  ["vcs" "push"]])
+                  [["shell" "echo" "commit"]]
+                  ["vcs" "push"]
+                  [["shell" "echo" "done"]]])
