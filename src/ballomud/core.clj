@@ -222,8 +222,8 @@
   (async-println
    (rand-nth ["You hear a soft breeze blowing."
               "Your stomach grumbles."
-              "A fly buzzes unseen nearby."
-              "Someone coughs."])))
+              "A faint rustling sound can be heard."
+              "A fly buzzes unseen nearby."])))
 
 (defn trimmed-input []
   (str/trim (or (read-line) "")))
@@ -233,19 +233,18 @@
     (async-println event)))
 
 (defn random-event [player-name world]
-  (try
-    (Thread/sleep (rand-int 10000))
-    (when (zero? (rand-int 2))
-      ((rand-nth [print-random-atmospheric!
-                  move-npcs!])
-       player-name world))
-    (catch Exception e
-      (println (str "Exception! " e))
-      (println e))))
+  ((rand-nth [print-random-atmospheric! move-npcs!])
+   player-name world))
 
 (defn maybe-do-something-random-later [player-name world]
   (future
-    (random-event player-name world)))
+    (try
+      (Thread/sleep (rand-int 10000))
+      (when (zero? (rand-int 2))
+        (random-event player-name world))
+      (catch Exception e
+        (println (str "Exception! " e))
+        (println e)))))
 
 (defn handle-player-command [player-name command world]
   (let [response (handle-command player-name
@@ -254,6 +253,12 @@
     (println (wrap response))
     (maybe-do-something-random-later player-name world)))
 
+(defn random-event-loop [player-name world]
+  (loop []
+    (Thread/sleep (rand-int 60000))
+    (random-event player-name world)
+    (recur)))
+
 (defn do-player-loop [out player-name world]
   (swap! stdouts assoc player-name out)
   (printf "Welcome to BalloMUD, %s.\n" player-name)
@@ -261,6 +266,7 @@
   (println (wrap (m/describe-player-location player-name
                                              @world
                                              :detailed)))
+  (future (random-event-loop player-name world))
   (loop []
     (print ">>> ")
     (flush)
