@@ -341,7 +341,7 @@
 
 (defn add-npcs
   ([world-map]
-   (let [n (inc (rand-int (rand-int (inc (rand-int max-npcs)))))]
+   (let [n (inc (rand-int 5))]
      (add-npcs n world-map)))
   ([n world-map]
    (if (zero? n)
