@@ -35,9 +35,28 @@
   (doseq [[pl out] @stdouts]
     (binding [*out* out]
       (async-println
-       (format "%s says: '%s'." player-name content)))))
+       (format "%s shouts: '%s'." player-name content)))))
 
-(defn say [player-name args]
+(defn tell-people-in-room [speaker-name room-id content]
+  (doseq [[pl out] @stdouts]
+    (let [pl-location (m/player-location-id pl @world)]
+      (when (= pl-location room-id)
+        (binding [*out* out]
+          (async-println
+           (format "%s says: '%s'." speaker-name content)))))))
+
+(defn say [player-name args world]
+  (let [content (->> args
+                     (map util/remove-edge-quotes)
+                     (str/join " "))
+        player-location-id (m/player-location-id player-name
+                                                 @world)]
+    (tell-people-in-room player-name
+                         player-location-id
+                         content)
+    ""))
+
+(defn shout [player-name args]
   (let [content (->> args
                      (map util/remove-edge-quotes)
                      (str/join " "))]
@@ -54,7 +73,8 @@
     look  -- describe where you are
     look at <thing>
     quit
-    say   -- tell something to everyone
+    say   -- tell something to people nearby
+    shout -- yell something to everyone
     time  -- get current time
     n     or north
     s     or south
@@ -164,7 +184,8 @@
           [(["get" something] :seq)] (pick-up player-name something world)
           [(["pick" "up" something] :seq)] (pick-up player-name something world)
           [(["drop" something] :seq)] (drop-thing player-name something world)
-          [(["put" "down" something] :seq)] (drop-thing player-name something world)
+          [(["put" "down" something] :seq)]
+          (drop-thing player-name something world)
           [(["dump"] :seq)] (dump-state @world)
           [(["dump" thing] :seq)] (dump-state ((keyword thing) @world))
           :else nil)
@@ -174,8 +195,9 @@
           [(["current" "time"] :seq)] (get-time)
           [(["show" "current" "time"] :seq)] (get-time)
           [(["what" "is" "current" "time"] :seq)] (get-time)
-          [(["say" & something] :seq)] (say player-name something)
-          [(["tell" "everyone" & something] :seq)] (say player-name something)
+          [(["say" & something] :seq)] (say player-name something world)
+          [(["shout" & something] :seq)] (shout player-name something)
+          [(["tell" "everyone" & something] :seq)] (shout player-name something)
           [(["time"] :seq)] (get-time)
           [(["inventory"] :seq)] (inventory player-name world)
           [(["i"] :seq)] (inventory player-name world)
