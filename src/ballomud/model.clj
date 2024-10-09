@@ -1,5 +1,6 @@
 (ns ballomud.model
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [ballomud.event :as e]))
 
 (defn player-location-id [player-name world-state]
   (get-in world-state [:players player-name :location]))
@@ -14,6 +15,7 @@
     (assoc-in world-map [:players player-name] {:location room-id
                                                 :name player-name
                                                 :visited #{room-id}})))
+
 (defn room-occupants [room-id world-map]
   (->> world-map
        :players
@@ -89,7 +91,7 @@
              (throw e#)
              edata#))))))
 
-(defn try-to-move-player! [player-name direction world-atom]
+(defn try-to-move-player! [player-name direction world-atom event-queue]
   (with-oops-swap "movement error" oops
     (swap!
      world-atom
@@ -102,12 +104,19 @@
            (not old-loc) (oops :no-player-loc)
            (not room) (oops :no-room-found)
            (not new-loc) (oops :cannot-go-that-way)
-           :else (-> world
-                     (assoc-in [:players player-name :location] new-loc)
-                     (update-in [:players player-name :visited]
-                                conj new-loc)
-                     (assoc-in [:players player-name :is-new-location?]
-                               (not visited?)))))))))
+           :else
+           (do
+             (e/add-event!
+              event-queue
+              (e/->room-change-event player-name
+                                     old-loc
+                                     new-loc))
+             (-> world
+                 (assoc-in [:players player-name :location] new-loc)
+                 (update-in [:players player-name :visited]
+                            conj new-loc)
+                 (assoc-in [:players player-name :is-new-location?]
+                           (not visited?))))))))))
 
 (defn player-inventory [player-name world-map]
   (let [obj-ids (get-in world-map [:players player-name :inventory] [])]
@@ -164,7 +173,7 @@
   Move NPCs around the world.
   Returns a list of events that happened (currently, just strings).
   "
-  [player-name world-atom leave-probability]
+  [world-atom leave-probability event-queue]
   (let [events (atom [])]
     (swap! world-atom
            (fn [world]
@@ -180,21 +189,16 @@
                          room-id (player-location-id npc-name world)
                          room (get-in world [:rooms room-id])
                          neighbors (:leads_to room)
-                         [_ new-room-id] (rand-nth (vec neighbors))
-                         player-room (player-location-id player-name world)]
+                         [_ new-room-id] (rand-nth (vec neighbors))]
                      (if (or (> (rand) leave-probability)
                              (= room-id new-room-id))
                        (recur (rest npcs) world)
                        (do
-                         #_(swap! events conj (format "%s moves from %s to %s."
-                                                      npc-name
-                                                      room-id
-                                                      new-room-id))
-                         (when (= new-room-id player-room)
-                           (swap! events conj (format "%s appears." npc-name)))
-                         (when (and (= room-id player-room)
-                                    (not= player-room new-room-id))
-                           (swap! events conj (format "%s leaves." npc-name)))
+                         (e/add-event!
+                          event-queue
+                          (e/->room-change-event npc-name
+                                                 room-id
+                                                 new-room-id))
                          (recur (rest npcs)
                                 (assoc-in world
                                           [:players npc-name :location]

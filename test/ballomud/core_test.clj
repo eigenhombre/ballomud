@@ -1,1 +1,0 @@
-(ns ballomud.core-test)

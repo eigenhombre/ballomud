@@ -3,20 +3,23 @@
   (:require [ballomud.model :as m]
             [ballomud.npc :as n]
             [ballomud.reader :as reader]
+            [ballomud.event :as e]
             [ballomud.util :as util]
             [clj-wrap-indent.core :as wrap]
             [clojure.core.match :refer [match]]
             [clojure.core.server :as server]
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import [java.net SocketException]))
 
 ;; For REPL hot reloading:
 (defonce live (atom false))
 (defonce world (atom nil))
+(defonce events (e/make-event-queue "room change events"))
 (comment (reset! live true))
 
-(def stdouts (atom {}))
+(defonce stdouts (atom {}))
 
 (defn wrap [s]
   (wrap/wrap-indent s 50 2))
@@ -26,14 +29,24 @@
   (print ">>> ")
   (flush))
 
+(defmacro output-to
+  {:style/indent 1}
+  [out & body]
+  `(try
+     (binding [*out* ~out]
+       ~@body)
+     (catch SocketException _#
+       ;; Socket was closed by client
+       )))
+
 (comment
   (doseq [[pl out] @stdouts]
-    (binding [*out* out]
+    (output-to out
       (async-println "Test of broadcasting from the REPL"))))
 
 (defn broadcast [player-name content]
   (doseq [[pl out] @stdouts]
-    (binding [*out* out]
+    (output-to out
       (async-println
        (format "%s shouts: '%s'." player-name content)))))
 
@@ -41,7 +54,7 @@
   (doseq [[pl out] @stdouts]
     (let [pl-location (m/player-location-id pl @world)]
       (when (= pl-location room-id)
-        (binding [*out* out]
+        (output-to out
           (async-println
            (format "%s says: '%s'." speaker-name content)))))))
 
@@ -102,7 +115,8 @@
                         "dwn" "d"}
                        direction-str
                        direction-str))
-         world)]
+         world
+         events)]
     (if (= status :fail)
       (get m/ttmp-error-descriptions error "Unknown error")
       (m/describe-player-location player-name @world))))
@@ -240,55 +254,83 @@
 (defn splash []
   (println (slurp (io/resource "art.txt"))))
 
-(defn print-random-atmospheric! [_ _]
+(defn print-random-atmospheric! []
   (async-println
    (rand-nth ["You hear a soft breeze blowing."
               "Your stomach grumbles."
               "A faint rustling sound can be heard."
+              "The air feels heavy."
+              "You hear a distant bird call."
+              "The light dims momentarily."
+              "A distant rumble of thunder can be heard."
               "A fly buzzes unseen nearby."])))
 
 (defn trimmed-input []
   (str/trim (or (read-line) "")))
 
-(defn move-npcs! [player-name world]
-  (doseq [event (m/move-npcs! player-name world 0.3)]
-    (async-println event)))
-
-(defn random-event [player-name world]
-  ((rand-nth [print-random-atmospheric! move-npcs!])
-   player-name world))
-
-(defn maybe-do-something-random-later [player-name world]
-  (future
-    (try
-      (Thread/sleep (rand-int 10000))
-      (when (zero? (rand-int 2))
-        (random-event player-name world))
-      (catch Exception e
-        (println (str "Exception! " e))
-        (println e)))))
+(defn move-npcs! [world]
+  (m/move-npcs! world 0.3 events))
 
 (defn handle-player-command [player-name command world]
   (let [response (handle-command player-name
                                  command
                                  world)]
-    (println (wrap response))
-    (maybe-do-something-random-later player-name world)))
+    (println (wrap response))))
 
-(defn random-event-loop [player-name world]
+(defn handle-room-change-event [evt]
+  (doseq [[pl out] @stdouts]
+    (let [pl-location (m/player-location-id pl @world)
+          {:keys [player-name oldroom newroom]} evt]
+      (when (and (not= pl player-name)
+                 (= pl-location oldroom))
+        (output-to out
+          (async-println
+           (format "%s leaves." player-name))))
+      (when (and (not= pl player-name)
+                 (= pl-location newroom))
+        (output-to out
+          (async-println
+           (format "%s arrives." player-name)))))))
+
+(defn handle-pending-events []
   (loop []
-    (Thread/sleep (rand-int 60000))
-    (random-event player-name world)
+    (if-let [evt (e/next-event! events)]
+      (cond
+        (instance? ballomud.event.room-change-event evt)
+        (handle-room-change-event evt)
+
+        :t (println "Unknown event type" evt))
+      (Thread/sleep 100))
+    (recur)))
+
+(defn random-event-loop [world]
+  (loop []
+    (Thread/sleep (rand-int 1000))
+    (when (< (rand) 0.01)
+      (move-npcs! world))
+    (when (< (rand) 0.01)
+      (print-random-atmospheric!))
     (recur)))
 
 (defn do-player-loop [out player-name world]
   (swap! stdouts assoc player-name out)
-  (printf "Welcome to BalloMUD, %s.\n" player-name)
+  (printf "Welcome to Ball'o'MUD, %s.\n" player-name)
   (m/add-player! player-name "hearth" world)
   (println (wrap (m/describe-player-location player-name
                                              @world
                                              :detailed)))
-  (future (random-event-loop player-name world))
+  (future
+    (try
+      (random-event-loop world)
+      (catch Exception e
+        (prn e))))
+
+  (future
+    (try
+      (handle-pending-events)
+      (catch Exception e
+        (prn e))))
+
   (loop []
     (print ">>> ")
     (flush)
@@ -304,7 +346,7 @@
                           (recur)))
         :else (recur)))))
 
-(defn accept [skip-intro? world]
+(defn player-login [skip-intro? world]
   (splash)
   (when-not skip-intro?
     (print "Are you a bot?  Type 'n' or 'no' if not... ")
@@ -339,7 +381,7 @@
   (server/start-server {:name "ballomud"
                         :address host
                         :port port
-                        :accept 'ballomud.core/accept
+                        :accept 'ballomud.core/player-login
                         :args [skip-intro? world]
                         :server-daemon daemon?}))
 
@@ -359,11 +401,11 @@
        slurp
        reader/read-from-string))
 
-(def max-npcs 50)
+(def max-npcs 5)
 
 (defn add-npcs
   ([world-map]
-   (let [n (inc (rand-int 5))]
+   (let [n (inc (rand-int max-npcs))]
      (add-npcs n world-map)))
   ([n world-map]
    (if (zero? n)
