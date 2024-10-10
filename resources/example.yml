@@ -1,0 +1,22 @@
+things:
+  flashlight:
+    shortdesc: "a small, silver flashlight"
+    desc: >
+        A small, silver flashlight, slightly tarnished.
+rooms:
+  hearth:
+    shortdesc: "The hearth."
+    desc: >
+        The Lorem Hearth, home of the many.
+    contains:
+      - flashlight
+    leads_to:
+        n:
+          ship
+  ship:
+    shortdesc: "The ship."
+    desc: >
+        A place of seasickness and spray.
+    leads_to:
+        s:
+          hearth

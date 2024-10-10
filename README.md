@@ -24,11 +24,13 @@ Mud](http://www.laputan.org/mud/) software architecture antipattern
 This is a "[sandbox](https://en.wikipedia.org/wiki/Sandbox_game)" text
 game in progress with limited features so far:
 
-- YML-based initial world state
+- YML-based initial world state, with alternate "worlds" supported
+  via command line argument
 - Move from room to room via (currently) six directions
+- Observe movements of players and "NPC"s
 - Pick up and drop things
-- Talk out loud
 - Look around or at things
+- Talk out loud to people in room or "everywhere"
 - Look at the entire game state(!)
 - NPCs (that don't do anything yet)
 

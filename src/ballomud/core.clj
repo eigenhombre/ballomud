@@ -397,9 +397,8 @@
     (assert (get (:rooms world) dest)
             (format "%s is not a known room!" dest))))
 
-(defn world-src []
-  (->> "world.yml"
-       io/resource
+(defn world-src [world-file]
+  (->> (or world-file (io/resource "world.yml"))
        slurp
        reader/read-from-string))
 
@@ -414,8 +413,8 @@
      world-map
      (add-npcs (dec n) (m/add-npc (n/npc-name) world-map)))))
 
-(defn- main [host port daemon? skip-intro?]
-  (reset! world (add-npcs (world-src)))
+(defn- main [host port daemon? skip-intro? world-file]
+  (reset! world (add-npcs (world-src world-file)))
   (check-all-directions @world)
   (print
    (format "Server name: '%s'  port: %d.  Accepting connections...."
@@ -423,12 +422,12 @@
   (flush)
   (start-server host port daemon? skip-intro? world))
 
-(defn -main [& [host port skip-intro?]]
+(defn -main [& [host port skip-intro? world-file]]
   (let [host (or host "0.0.0.0")
         port (Integer. (or port "9999"))]
-    (main host port false false)))
+    (main host port false false world-file)))
 
 (when @live
-  (check-all-directions (world-src))
+  (check-all-directions (world-src nil))
   (server/stop-server "ballomud")
-  (main "localhost" 9999 true true))
+  (main "localhost" 9999 true true nil))
