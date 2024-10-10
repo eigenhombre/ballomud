@@ -39,24 +39,28 @@
        ;; Socket was closed by client
        )))
 
+(defmacro do-outs
+  {:style/indent 1}
+  [pl & body]
+  `(doseq [[~pl out#] @stdouts]
+     (output-to out#
+       ~@body)))
+
 (comment
-  (doseq [[pl out] @stdouts]
-    (output-to out
-      (async-println "Test of broadcasting from the REPL"))))
+  (do-outs pl
+    (async-println "Test of broadcasting from the REPL")))
 
 (defn broadcast [player-name content]
-  (doseq [[pl out] @stdouts]
-    (output-to out
-      (async-println
-       (format "%s shouts: '%s'." player-name content)))))
+  (do-outs pl
+    (async-println
+     (format "%s shouts: '%s'." player-name content))))
 
 (defn tell-people-in-room [speaker-name room-id content]
-  (doseq [[pl out] @stdouts]
+  (do-outs pl
     (let [pl-location (m/player-location-id pl @world)]
       (when (= pl-location room-id)
-        (output-to out
-          (async-println
-           (format "%s says: '%s'." speaker-name content)))))))
+        (async-println
+         (format "%s says: '%s'." speaker-name content))))))
 
 (defn say [player-name args world]
   (let [content (->> args
@@ -278,19 +282,17 @@
     (println (wrap response))))
 
 (defn handle-room-change-event [evt]
-  (doseq [[pl out] @stdouts]
+  (do-outs pl
     (let [pl-location (m/player-location-id pl @world)
           {:keys [player-name oldroom newroom]} evt]
       (when (and (not= pl player-name)
                  (= pl-location oldroom))
-        (output-to out
-          (async-println
-           (format "%s leaves." player-name))))
+        (async-println
+         (format "%s leaves." player-name)))
       (when (and (not= pl player-name)
                  (= pl-location newroom))
-        (output-to out
-          (async-println
-           (format "%s arrives." player-name)))))))
+        (async-println
+         (format "%s arrives." player-name))))))
 
 (defn handle-pending-events []
   (loop []
