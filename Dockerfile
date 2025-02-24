@@ -11,4 +11,3 @@ RUN lein deps
 COPY . /home/janice
 RUN make test lint uberjar
 CMD ["./mud"]
-
