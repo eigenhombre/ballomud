@@ -1,4 +1,4 @@
-(defproject ballomud "0.0.14-SNAPSHOT"
+(defproject ballomud "0.0.14"
   :description "A small MUD-inspired game"
   :url "https://github.com/eigenhombre/ballomud"
   :license {:name "MIT"}
