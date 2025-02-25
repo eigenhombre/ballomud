@@ -15,9 +15,10 @@
 
 ;; For REPL hot reloading:
 (defonce live (atom false))
+(comment (reset! live true))
+
 (defonce world (atom nil))
 (defonce events (e/make-event-queue "room change events"))
-(comment (reset! live true))
 
 (defonce stdouts (atom {}))
 
@@ -48,12 +49,16 @@
 
 (comment
   (do-outs pl
-    (async-println "Test of broadcasting from the REPL")))
+    (async-println (format "Test of broadcasting from the REPL -- hi %s!"
+                           pl))))
 
 (defn broadcast [player-name content]
   (do-outs pl
     (async-println
      (format "%s shouts: '%s'." player-name content))))
+
+(comment
+  (broadcast "Paul Muad'Dib" "The spice must flow!"))
 
 (defn tell-people-in-room [speaker-name room-id content]
   (do-outs pl
@@ -305,12 +310,37 @@
       (Thread/sleep 100))
     (recur)))
 
+(defonce settings (atom {::longest-sleep 1000
+                         ::npc-move-prob 0.01
+                         ::effect-prob 0.01
+                         ::max-npcs 5}))
+
+;; Play with these at the REPL:
+(comment
+  (swap! settings assoc ::longest-sleep 1000)
+  (swap! settings assoc ::longest-sleep 5)
+  (swap! settings assoc ::npc-move-prob 0.01)
+  (swap! settings assoc ::effect-prob 0.01)
+
+  (defn faster []
+    (swap! settings update ::longest-sleep (partial + -10))
+    (swap! settings update ::effect-prob (partial * 1.1))
+    (swap! settings update ::npc-move-prob (partial * 1.1)))
+  (defn slower []
+    (swap! settings update ::longest-sleep (partial + 10))
+    (swap! settings update ::effect-prob (partial * 0.9))
+    (swap! settings update ::npc-move-prob (partial * 0.9)))
+
+  (faster)
+  (slower)
+  )
+
 (defn random-event-loop [world]
   (loop []
-    (Thread/sleep (rand-int 1000))
-    (when (< (rand) 0.01)
+    (Thread/sleep (rand-int (@settings ::longest-sleep)))
+    (when (< (rand) (@settings ::npc-move-prob))
       (move-npcs! world))
-    (when (< (rand) 0.01)
+    (when (< (rand) (@settings ::effect-prob))
       (print-random-atmospheric!))
     (recur)))
 
@@ -402,11 +432,9 @@
        slurp
        reader/read-from-string))
 
-(def max-npcs 5)
-
 (defn add-npcs
   ([world-map]
-   (let [n (inc (rand-int max-npcs))]
+   (let [n (inc (rand-int (@settings ::max-npcs)))]
      (add-npcs n world-map)))
   ([n world-map]
    (if (zero? n)
