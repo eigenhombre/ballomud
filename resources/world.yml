@@ -8,6 +8,10 @@ things:
     shortdesc: "a red brick"
     desc: >
         A red brick, somewhat weathered.
+  key:
+    shortdesc: "a rusty key"
+    desc: >
+        A rusty key, with a small tag that reads "Attic".
 rooms:
   hearth:
     shortdesc: "The hearth."
@@ -29,6 +33,7 @@ rooms:
         There is a ladder leading down to the hearth.
     contains:
       - brick
+      - key
     leads_to:
         d:
           hearth
