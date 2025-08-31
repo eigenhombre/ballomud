@@ -441,7 +441,7 @@
      world-map
      (add-npcs (dec n) (m/add-npc (n/npc-name) world-map)))))
 
-(defn- main [host port daemon? skip-intro? world-file]
+(defn main [host port daemon? skip-intro? world-file]
   (reset! world (add-npcs (world-src world-file)))
   (check-all-directions @world)
   (print
