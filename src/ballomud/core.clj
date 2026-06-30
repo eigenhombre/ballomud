@@ -275,7 +275,8 @@
               "A fly buzzes unseen nearby."])))
 
 (defn trimmed-input []
-  (str/trim (or (read-line) "")))
+  (when-let [line (read-line)]
+    (str/trim line)))
 
 (defn move-npcs! [world]
   (m/move-npcs! world 0.3 events))
@@ -368,6 +369,7 @@
     (flush)
     (let [command (trimmed-input)]
       (cond
+        (nil? command) (disconnect world player-name)
         (iseof command) (disconnect world player-name)
         (seq command) (if (is-quit? command)
                         (disconnect world player-name)

@@ -1,39 +1,51 @@
-.PHONY: ancient clean all test lint docker dockerpush release
+SOURCES := $(shell find src -name '*.clj')
+RESOURCES := $(wildcard resources/*)
 
-JAR=target/uberjar/ballomud-0.1.0-SNAPSHOT-standalone.jar
+default: uber
 
-default: uberjar
+JAR=target/ballomud.jar
 
-all: clean uberjar lint test docker
+.PHONY: uber
+uber: $(JAR)
 
-uberjar: ${JAR}
+$(JAR): $(SOURCES) $(RESOURCES) deps.edn build.clj
+	clojure -T:build uber
 
-${JAR}: src/ballomud/*.clj resources/*
-	lein uberjar
+.PHONY: deps
+deps:
+	clojure -P
 
+.PHONY: test
 test:
-	lein cloverage
+	clojure -M:test
 
+.PHONY: clean
 clean:
-	rm -rf target
+	rm -rf target/ .cpcache/
 
-lint:
-	lein kibit
-
+.PHONY: docker
 docker:
 	docker build -t ballomud .
 
-deploy: ${JAR}
+.PHONY: install
+install: $(JAR)
+	@if [ ! -d "$${BINDIR:-$$HOME/bin}" ]; then \
+		echo "Error: Install directory $${BINDIR:-$$HOME/bin} does not exist."; \
+		echo "Please create it or set BINDIR to an existing directory."; \
+		exit 1; \
+	fi
+	cp ballomud $${BINDIR:-$$HOME/bin}/
+	cp $(JAR) $${BINDIR:-$$HOME/bin}/ballomud.jar
+
+.PHONY: deploy
+deploy: $(JAR)
 	rsync -vurt ../ballomud tw:
-	ssh tw 'killall java; sleep 1; cd ballomud; nohup ./tw 0.0.0.0 >/dev/null 2>&1 &'
+	ssh tw 'killall java; sleep 1; cd ballomud; nohup ./ballomud 0.0.0.0 >/dev/null 2>&1 &'
 
-ancient:
-	lein ancient :all
+.PHONY: docker-run
+docker-run:
+	docker run -it -p 9999:9999 ballomud
 
-# N.B.: `docker login` first:
+.PHONY: dockerpush
 dockerpush:
 	docker push -a eigenhombre/ballomud
-
-release:
-	lein release
-	echo 'You should `make dockerpush` now.'

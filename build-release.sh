@@ -2,7 +2,7 @@
 
 set -eu
 
-VERSION=v$(lein pprint --no-pretty -- :version)
+VERSION=$(grep 'def version' build.clj | grep -o '"[^"]*"' | tr -d '"')
 
 echo "About to build $VERSION..."
 

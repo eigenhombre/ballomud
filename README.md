@@ -46,10 +46,14 @@ game in progress with limited features so far:
 
 # building it for yourself
 
-Install [Leiningen](https://leiningen.org/) and `make` using your
-package manager.  Then,
+Install the [Clojure CLI](https://clojure.org/guides/install_clojure) and
+`make` using your package manager.  Then,
 
-    make && ./mud
+    make install && ballomud
+
+Or, to run via Docker:
+
+    make docker && make docker-run
 
 # playing your local copy
 

@@ -1,6 +1,7 @@
 *.class
 *.html
 *.jar
+.cpcache/
 /.lein-*
 /.nrepl-port
 /.prepl-port
