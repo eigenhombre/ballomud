@@ -2,7 +2,7 @@ FROM sapmachine
 
 RUN apt-get -y update
 RUN apt-get -y upgrade
-RUN apt-get install -y make curl rlwrap
+RUN apt-get install -y make curl rlwrap git
 
 RUN curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh \
     && chmod +x linux-install.sh \
